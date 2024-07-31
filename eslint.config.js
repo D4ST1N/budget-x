@@ -11,6 +11,9 @@ export default [
   eslintConfigPrettier,
   ...tseslint.configs.recommended,
   ...pluginVue.configs["flat/essential"],
+  ...pluginVue.configs["vue3-essential"],
+  ...pluginVue.configs["vue3-strongly-recommended"],
+  ...pluginVue.configs["vue3-recommended"],
   {
     files: ["**/*.vue"],
     languageOptions: { parserOptions: { parser: tseslint.parser } },
