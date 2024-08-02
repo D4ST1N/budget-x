@@ -1,9 +1,5 @@
-<script setup lang="ts">
-console.log(import.meta.env);
-console.log(import.meta.env.VITE_SERVER_URL);
-fetch(import.meta.env.VITE_SERVER_URL);
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <v-btn>Add Expense</v-btn>
+  <h1>Home</h1>
 </template>
