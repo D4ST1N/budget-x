@@ -39,13 +39,16 @@ router.beforeEach(async (to, _from, next) => {
 
   if (to.matched.some((record) => record.meta.authRequired)) {
     if (token) {
-      const response = await fetch("http://localhost:3000/auth/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/auth/verify`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token }),
+        }
+      );
       const parsedResponse = (await response.json()) as { success: boolean };
 
       if (!parsedResponse.success) {
@@ -59,13 +62,16 @@ router.beforeEach(async (to, _from, next) => {
     }
   } else if (to.matched.some((record) => record.name === "Login")) {
     if (token) {
-      const response = await fetch("http://localhost:3000/auth/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/auth/verify`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token }),
+        }
+      );
       const parsedResponse = (await response.json()) as { success: boolean };
 
       if (parsedResponse.success) {

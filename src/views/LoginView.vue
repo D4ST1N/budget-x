@@ -5,7 +5,7 @@ import { StytchUIClient, OAuthProviders, Products } from "@stytch/vanilla-js";
 const stytch = new StytchUIClient(
   "public-token-test-1baf643f-2310-434f-a342-d18aee480568"
 );
-const REDIRECT_URL = "http://localhost:3000/auth";
+const REDIRECT_URL = `${import.meta.env.VITE_SERVER_URL}/auth`;
 
 onMounted(() => {
   stytch.mountLogin({
