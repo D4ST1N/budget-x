@@ -1,32 +1,11 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { StytchUIClient, OAuthProviders, Products } from "@stytch/vanilla-js";
+import { useUserStore } from "@/store/user";
 
-const stytch = new StytchUIClient(
-  "public-token-test-1baf643f-2310-434f-a342-d18aee480568"
-);
-const REDIRECT_URL = `${import.meta.env.VITE_SERVER_URL}/auth`;
+const userStore = useUserStore();
 
 onMounted(() => {
-  stytch.mountLogin({
-    elementId: "#stytch-sdk",
-    config: {
-      products: [Products.emailMagicLinks, Products.oauth],
-      emailMagicLinksOptions: {
-        loginRedirectURL: REDIRECT_URL,
-        loginExpirationMinutes: 60,
-        signupRedirectURL: REDIRECT_URL,
-        signupExpirationMinutes: 60,
-      },
-      oauthOptions: {
-        providers: [
-          {
-            type: OAuthProviders.Google,
-          },
-        ],
-      },
-    },
-  });
+  userStore.loginUser("#stytch-sdk");
 });
 </script>
 
