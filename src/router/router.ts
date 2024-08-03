@@ -2,6 +2,7 @@ import { createWebHistory, createRouter } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
 import StatisticView from "@/views/StatisticView.vue";
 import LoginView from "@/views/LoginView.vue";
+import { useUserStore } from "@/store/user";
 
 const routes = [
   {
@@ -30,6 +31,8 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, _from, next) => {
+  const userStore = useUserStore();
+
   if (to.query.session_token) {
     localStorage.setItem("session_token", String(to.query.session_token));
     router.replace({ query: undefined });
@@ -39,19 +42,9 @@ router.beforeEach(async (to, _from, next) => {
 
   if (to.matched.some((record) => record.meta.authRequired)) {
     if (token) {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/auth/verify`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token }),
-        }
-      );
-      const parsedResponse = (await response.json()) as { success: boolean };
+      const response = await userStore.verifyUser(token);
 
-      if (!parsedResponse.success) {
+      if (!response.success) {
         localStorage.removeItem("session_token");
         next("/login");
         return;
@@ -62,19 +55,9 @@ router.beforeEach(async (to, _from, next) => {
     }
   } else if (to.matched.some((record) => record.name === "Login")) {
     if (token) {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/auth/verify`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token }),
-        }
-      );
-      const parsedResponse = (await response.json()) as { success: boolean };
+      const response = await userStore.verifyUser(token);
 
-      if (parsedResponse.success) {
+      if (response.success) {
         next("/");
       }
     }
