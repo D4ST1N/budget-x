@@ -5,7 +5,7 @@ import { useUserStore } from "@/store/user";
 
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
-console.log(user);
+
 const provider = computed(() => {
   if (!user.value) return null;
 
@@ -24,7 +24,10 @@ const provider = computed(() => {
         :class="$style.userAvatar"
       />
     </div>
-    <div>{{ user.name.first_name }} {{ user.name.last_name }}</div>
+
+    <div :class="$style.userName">
+      {{ user.name.first_name }} {{ user.name.last_name }}
+    </div>
   </div>
 </template>
 
@@ -45,5 +48,9 @@ const provider = computed(() => {
 
 .userAvatar {
   width: 100%;
+}
+
+.userName {
+  max-width: 200px;
 }
 </style>

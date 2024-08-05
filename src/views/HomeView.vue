@@ -1,5 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import BaseLayout from "@/layouts/Base.vue";
+</script>
 
 <template>
-  <h1>Home</h1>
+  <BaseLayout>
+    <v-card-title>{{ $t("home.title") }}</v-card-title>
+  </BaseLayout>
 </template>
