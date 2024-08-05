@@ -10,10 +10,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div :class="$style.page">
-    <h1>Login page</h1>
+  <v-card variant="tonal" :class="$style.page">
+    <v-card-title>{{ $t("login.title") }}</v-card-title>
     <div id="stytch-sdk"></div>
-  </div>
+  </v-card>
 </template>
 
 <style lang="scss" module>
@@ -22,5 +22,6 @@ onMounted(() => {
   flex-direction: column;
   gap: 20px;
   align-items: center;
+  padding: 16px;
 }
 </style>
