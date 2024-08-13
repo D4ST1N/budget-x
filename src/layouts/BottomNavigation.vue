@@ -1,5 +1,5 @@
 <template>
-  <v-bottom-navigation grow color="secondary">
+  <v-bottom-navigation grow color="primary">
     <v-btn :to="{ name: 'Home' }">
       <v-icon>mdi-wallet-bifold</v-icon>
       <span>{{ $t("bottomNavigation.home") }}</span>

@@ -1,9 +1,13 @@
-export interface ServerResponse {
-  success: boolean;
-  message: string;
+import { ErrorType } from "@/types/ErrorType";
+
+export type ServerResponse = SuccessServerResponse | ServerResponseError;
+
+export interface SuccessServerResponse {
+  success: true;
 }
 
-export interface ServerResponseError extends ServerResponse {
+export interface ServerResponseError {
   success: false;
-  error: Error;
+  errorType: ErrorType;
+  error?: Error;
 }
