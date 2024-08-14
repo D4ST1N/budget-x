@@ -1,5 +1,5 @@
 import { SuccessServerResponse } from "@/types/ServerResponse";
-import { User } from "@stytch/vanilla-js";
+import { UserData } from "./User";
 
 export interface WalletData {
   name: string;
@@ -26,5 +26,10 @@ export interface SuccessWalletShareResponse extends SuccessServerResponse {
 }
 
 export interface SuccessWalletUsersFetchResponse extends SuccessServerResponse {
-  users: User[];
+  users: UserData[];
+}
+
+export interface SuccessInvitationInfoResponse extends SuccessServerResponse {
+  walletName: string;
+  creator: UserData;
 }

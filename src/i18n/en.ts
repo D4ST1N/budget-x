@@ -15,6 +15,7 @@ export default {
     textCopied: "Link copied",
     textCopyFailed: "Error during the copying",
     walletJoined: "Successfully joined the wallet",
+    userRemoved: "Wallet access for the user removed",
   },
   errors: {
     NoTokenProvided: "Authorization failed. Please try again",
@@ -28,6 +29,7 @@ export default {
     InvitationNotFound: "Invitation link is not valid",
     InvitationExpired: "Invitation link expired",
     InvitationRunOut: "Invitation link run out of activations",
+    AvatarFetchError: "Failed to fetch the avatar",
   },
   home: {
     title: "Home page",
@@ -55,6 +57,9 @@ export default {
     generateLink: "Generate invite link",
     myWallets: "My wallets",
     sharedWallets: "Shared wallets",
+    noUserAdded:
+      "No users added to the wallet. Generate the link to share the wallet",
+    joiningWallet: "Invites you to join the wallet",
   },
   login: {
     title: "Authorization",

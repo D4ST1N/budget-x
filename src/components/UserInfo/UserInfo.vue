@@ -17,13 +17,9 @@ const provider = computed(() => {
 
 <template>
   <div v-if="user" :class="$style.userInfo">
-    <div :class="$style.userAvatarWrapper">
-      <img
-        :src="provider?.profile_picture_url"
-        alt="avatar"
-        :class="$style.userAvatar"
-      />
-    </div>
+    <v-avatar color="grey-lighten-1">
+      <v-img alt="avatar" :src="provider?.profile_picture_url"></v-img>
+    </v-avatar>
 
     <div :class="$style.userName">
       {{ user.name.first_name }} {{ user.name.last_name }}
@@ -36,18 +32,6 @@ const provider = computed(() => {
   display: flex;
   gap: 12px;
   align-items: center;
-}
-
-.userAvatarWrapper {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid rgba(var(--v-theme-background));
-}
-
-.userAvatar {
-  width: 100%;
 }
 
 .userName {
