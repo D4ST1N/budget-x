@@ -26,13 +26,7 @@ function getFlagUrl(locale: string) {
 </script>
 
 <template>
-  <v-select
-    v-model="$i18n.locale"
-    :items="languageOptions"
-    density="compact"
-    hide-details
-    :active="true"
-  >
+  <v-select v-model="$i18n.locale" :items="languageOptions" hide-details>
     <template #prepend-inner>
       <img
         :src="getFlagUrl($i18n.locale)"

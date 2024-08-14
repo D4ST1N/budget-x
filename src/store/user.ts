@@ -1,13 +1,24 @@
-import { ref } from "vue";
-import { defineStore } from "pinia";
-import { OAuthProviders, Products, User } from "@stytch/vanilla-js";
+import { verificationInterval } from "@/config/constants";
+import { authVerify } from "@/helpers/serverUrls";
+import { auth } from "@/plugins/axios";
 import stytch from "@/plugins/stytch";
+import ServerError from "@/types/ServerError";
 import { UserVerificationResponse } from "@/types/User";
+import { OAuthProviders, Products, User } from "@stytch/vanilla-js";
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
 
 const REDIRECT_URL = `${import.meta.env.VITE_SERVER_URL}/auth`;
 
 export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null);
+  const lastVerificationTime = ref<number | null>(null);
+
+  const isVerificationNeeded = computed(() => {
+    if (!lastVerificationTime.value) return true;
+
+    return Date.now() - lastVerificationTime.value > verificationInterval;
+  });
 
   function loginUser(elementId: string) {
     stytch.mountLogin({
@@ -32,28 +43,31 @@ export const useUserStore = defineStore("user", () => {
   }
 
   async function verifyUser(token: string) {
-    const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/auth/verify`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token }),
+    try {
+      const response = await auth.post<UserVerificationResponse>(
+        authVerify(),
+        JSON.stringify({ token })
+      );
+
+      if (response.data.success) {
+        user.value = response.data.user;
+        lastVerificationTime.value = Date.now();
       }
-    );
-    const parsedResponse = (await response.json()) as UserVerificationResponse;
 
-    if (parsedResponse.success) {
-      user.value = parsedResponse.user;
+      return response.data;
+    } catch (e) {
+      console.error(e);
+      return {
+        success: false,
+        error: ServerError.ServerConnectionFailed,
+      };
     }
-
-    return parsedResponse;
   }
 
   return {
+    user,
+    isVerificationNeeded,
     loginUser,
     verifyUser,
-    user,
   };
 });

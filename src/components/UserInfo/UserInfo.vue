@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { storeToRefs } from "pinia";
 import { useUserStore } from "@/store/user";
+import { storeToRefs } from "pinia";
+import { computed } from "vue";
 
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
@@ -43,7 +43,7 @@ const provider = computed(() => {
   height: 48px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid rgba(var(--v-theme-secondary));
+  border: 2px solid rgba(var(--v-theme-background));
 }
 
 .userAvatar {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import WalletList from "@/components/WalletList/WalletList.vue";
 import { onMounted } from "vue";
 
-const items = ["Main wallet", "Apartment"];
 const emit = defineEmits(["mounted"]);
 
 onMounted(() => {
@@ -15,20 +15,18 @@ onMounted(() => {
       <template #prepend>
         <slot name="app-bar-prepend">
           <v-app-bar-title :class="$style.toolbarTitle">
-            <img src="/img/budgetX-logo.png" alt="logo" />
+            <img src="/img/budgetX-logo.png" alt="logo" :class="$style.logo" />
           </v-app-bar-title>
         </slot>
       </template>
 
+      <template #default>
+        <slot name="app-bar" />
+      </template>
+
       <template #append>
         <slot name="app-bar-append">
-          <v-select
-            value="Main wallet"
-            :items="items"
-            density="compact"
-            hide-details
-            :class="$style.walletSelect"
-          ></v-select>
+          <WalletList />
         </slot>
       </template>
     </v-app-bar>
@@ -65,5 +63,9 @@ onMounted(() => {
 
 .walletSelect {
   width: 160px;
+}
+
+.logo {
+  height: 36px;
 }
 </style>

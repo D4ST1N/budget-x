@@ -1,5 +1,34 @@
 export default {
   languageName: "English",
+  ui: {
+    save: "Save",
+    delete: "Delete",
+    goHome: "To homepage",
+  },
+  validation: {
+    fieldIsRequired: "Required field",
+  },
+  notification: {
+    walletAdded: "Wallet added",
+    walletUpdated: "Wallet updated",
+    walletDeleted: "Wallet deleted",
+    textCopied: "Link copied",
+    textCopyFailed: "Error during the copying",
+    walletJoined: "Successfully joined the wallet",
+  },
+  errors: {
+    NoTokenProvided: "Authorization failed. Please try again",
+    AuthorizationFailed: "Unable to authorize",
+    NoWalletData: "Failed to create the wallet",
+    WalletFetchError: "Failed to receive wallets list",
+    WalletExists: "You already have a wallet with this name",
+    WalletCreationError: "Failed to create the wallet",
+    WalletNotFound: "Wallet not found",
+    WalletDeletionError: "Failed to delete the wallet",
+    InvitationNotFound: "Invitation link is not valid",
+    InvitationExpired: "Invitation link expired",
+    InvitationRunOut: "Invitation link run out of activations",
+  },
   home: {
     title: "Home page",
   },
@@ -9,6 +38,23 @@ export default {
   profile: {
     title: "Profile",
     logout: "Logout",
+  },
+  wallet: {
+    add: "Add wallet",
+    newWallet: "New wallet",
+    editWallet: "Configure wallet",
+    shareWallet: "Share wallet",
+    joinWallet: "Join wallet",
+    walletName: "Wallet name",
+    share: "Share",
+    edit: "Configure",
+    detail: "Detailed statistic",
+    addExpense: "New expense",
+    addIncome: "New income",
+    sharedForUsersTitle: "Users with access to the wallet",
+    generateLink: "Generate invite link",
+    myWallets: "My wallets",
+    sharedWallets: "Shared wallets",
   },
   login: {
     title: "Authorization",
