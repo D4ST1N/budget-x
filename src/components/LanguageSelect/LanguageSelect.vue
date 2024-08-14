@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import i18n from "@/plugins/i18n";
+import { useLanguageStore } from "@/store/language";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
-const i18n = useI18n();
-const { t, availableLocales } = i18n;
+const languageStore = useLanguageStore();
+const { t, availableLocales } = useI18n();
 
 const languageOptions = computed(() => {
   return availableLocales.map((locale) => {
@@ -23,10 +25,19 @@ function getFlagUrl(locale: string) {
     import.meta.url
   ).href;
 }
+
+function updateLanguage(locale: string) {
+  languageStore.changeLanguage(locale as typeof i18n.global.locale.value);
+}
 </script>
 
 <template>
-  <v-select v-model="$i18n.locale" :items="languageOptions" hide-details>
+  <v-select
+    :model-value="$i18n.locale"
+    :items="languageOptions"
+    hide-details
+    @update:model-value="updateLanguage"
+  >
     <template #prepend-inner>
       <img
         :src="getFlagUrl($i18n.locale)"

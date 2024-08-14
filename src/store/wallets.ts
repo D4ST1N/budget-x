@@ -7,11 +7,13 @@ import {
   removeWalletUser,
   updateWallet,
 } from "@/helpers/serverUrls";
+import { fetchUserAvatar } from "@/helpers/utils";
 import { api } from "@/plugins/axios";
 import { useNotificationStore } from "@/store/notification";
 import { useUserStore } from "@/store/user";
 import { NotificationType } from "@/types/Notification";
 import { ServerResponse, ServerResponseError } from "@/types/ServerResponse";
+import { UserData } from "@/types/User";
 import {
   SuccessWalletCreationResponse,
   SuccessWalletFetchResponse,
@@ -20,7 +22,6 @@ import {
   Wallet,
   WalletData,
 } from "@/types/Wallet";
-import { User } from "@stytch/vanilla-js";
 import { AxiosResponse } from "axios";
 import { defineStore, storeToRefs } from "pinia";
 import { computed, ref } from "vue";
@@ -33,7 +34,7 @@ export const useWalletStore = defineStore(
     const wallets = ref<Wallet[]>([]);
     const sharedWallets = ref<Wallet[]>([]);
     const selectedWallet = ref<string | null>(null);
-    const sharedUsers = ref<User[]>([]);
+    const sharedUsers = ref<UserData[]>([]);
     const fetchingWalletUsers = ref<boolean>(false);
 
     const i18n = useI18n();
@@ -180,16 +181,25 @@ export const useWalletStore = defineStore(
       const response: AxiosResponse<
         SuccessWalletUsersFetchResponse | ServerResponseError
       > = await api.get(getWalletUsers(selectedWallet.value!));
-      fetchingWalletUsers.value = false;
 
       if (response.data.success) {
-        sharedUsers.value = response.data.users;
+        sharedUsers.value = await Promise.all(
+          response.data.users.map(async (user) => {
+            user.providers[0].profile_picture_url = (await fetchUserAvatar(
+              user
+            )) as string;
+
+            return user;
+          })
+        );
       } else {
         notificationStore.add({
           text: i18n.t(`errors.${response.data.errorType}`),
           type: NotificationType.Error,
         });
       }
+
+      fetchingWalletUsers.value = false;
     }
 
     async function deleteWalletUser(userId: string) {

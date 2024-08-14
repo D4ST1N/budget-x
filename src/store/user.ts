@@ -1,5 +1,6 @@
 import { verificationInterval } from "@/config/constants";
 import { authVerify } from "@/helpers/serverUrls";
+import { fetchUserAvatar } from "@/helpers/utils";
 import { auth } from "@/plugins/axios";
 import stytch from "@/plugins/stytch";
 import ServerError from "@/types/ServerError";
@@ -51,6 +52,9 @@ export const useUserStore = defineStore("user", () => {
 
       if (response.data.success) {
         user.value = response.data.user;
+        user.value.providers[0].profile_picture_url = (await fetchUserAvatar(
+          user.value
+        )) as string;
         lastVerificationTime.value = Date.now();
       }
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DashboardPanel from "@/components/Dashboard/DashboardPanel.vue";
 import { useWalletStore } from "@/store/wallets";
-import { User } from "@stytch/vanilla-js";
+import { UserData } from "@/types/User";
 import { storeToRefs } from "pinia";
 import ShareSection from "./ShareSection.vue";
 
@@ -10,7 +10,7 @@ const { sharedUsers, fetchingWalletUsers } = storeToRefs(walletStore);
 
 walletStore.fetchWalletUsers();
 
-function getUserAvatar(user: User) {
+function getUserAvatar(user: UserData) {
   const [firstProvider] = user.providers;
 
   return firstProvider.profile_picture_url;
@@ -45,7 +45,7 @@ async function removeUser(userId: string) {
           >
             <template #prepend>
               <v-avatar color="grey-lighten-1">
-                <v-img alt="John" :src="getUserAvatar(user)"></v-img>
+                <v-img alt="avatar" :src="getUserAvatar(user)"></v-img>
               </v-avatar>
             </template>
 

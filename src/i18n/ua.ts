@@ -29,6 +29,7 @@ export default {
     InvitationNotFound: "Посилання на приєднання не дійсне",
     InvitationExpired: "Час дії посилання минув",
     InvitationRunOut: "Кількість приєднань по цьому посиланню вичерпано",
+    AvatarFetchError: "Не вдалось отримати аватар",
   },
   home: {
     title: "Інформація про гаманці",
@@ -58,6 +59,7 @@ export default {
     sharedWallets: "Спільні гаманці",
     noUserAdded:
       "Жодного користувача не додано до гаманця. Згенеруйте посилання, щоб поділитись гаманцем",
+    joiningWallet: "Запрошує Вас приєднатись до гаманця",
   },
   login: {
     title: "Авторизація",
