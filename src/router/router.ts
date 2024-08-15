@@ -88,7 +88,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory("budget-x"),
+  history: createWebHistory(),
   routes,
 });
 
