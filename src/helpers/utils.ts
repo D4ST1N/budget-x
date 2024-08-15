@@ -1,6 +1,8 @@
 import { auth } from "@/plugins/axios";
+import { AccessLevel } from "@/types/AccessLevel";
 import { UserData } from "@/types/User";
 import { User } from "@stytch/vanilla-js";
+
 import { getAvatar } from "./serverUrls";
 
 export function timeout(ms: number) {
@@ -27,4 +29,16 @@ export async function fetchUserAvatar(
   }
 
   return null;
+}
+
+export function hasAccess(
+  requiredAccess: AccessLevel[],
+  userAccess: AccessLevel[],
+  operator: "AND" | "OR" = "AND"
+) {
+  if (operator === "AND") {
+    requiredAccess.every((access) => userAccess.includes(access));
+  }
+
+  return requiredAccess.some((access) => userAccess.includes(access));
 }

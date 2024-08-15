@@ -1,14 +1,35 @@
 <script setup lang="ts">
 import DashboardPanel from "@/components/Dashboard/DashboardPanel.vue";
+import { hasAccess } from "@/helpers/utils";
+import { useUserStore } from "@/store/user";
 import { useWalletStore } from "@/store/wallets";
+import { AccessLevel } from "@/types/AccessLevel";
 import { UserData } from "@/types/User";
 import { storeToRefs } from "pinia";
+import { computed } from "vue";
+import ConfirmDialog from "../Dialog/ConfirmDialog.vue";
+import UserEditDialog from "../UserEditDialog/UserEditDialog.vue";
 import ShareSection from "./ShareSection.vue";
 
+const userStore = useUserStore();
 const walletStore = useWalletStore();
-const { sharedUsers, fetchingWalletUsers } = storeToRefs(walletStore);
+const { user: currentUser } = storeToRefs(userStore);
+const { sharedUsers, fetchingWalletUsers, currentAccessLevel } =
+  storeToRefs(walletStore);
 
 walletStore.fetchWalletUsers();
+
+const editUserAvailable = computed(() =>
+  hasAccess([AccessLevel.Edit], currentAccessLevel.value)
+);
+
+const deleteUserAvailable = computed(() =>
+  hasAccess([AccessLevel.Delete], currentAccessLevel.value)
+);
+
+function isCurrentUser(user: UserData) {
+  return user.user_id === currentUser.value!.user_id;
+}
 
 function getUserAvatar(user: UserData) {
   const [firstProvider] = user.providers;
@@ -37,6 +58,7 @@ async function removeUser(userId: string) {
             type="list-item-avatar"
           ></v-skeleton-loader>
         </template>
+
         <template v-else>
           <v-list-item
             v-for="user in sharedUsers"
@@ -49,13 +71,23 @@ async function removeUser(userId: string) {
               </v-avatar>
             </template>
 
-            <template #append>
-              <v-btn
-                color="grey-lighten-1"
-                icon="mdi-account-remove"
-                variant="text"
-                @click="removeUser(user.user_id)"
-              ></v-btn>
+            <template v-if="!isCurrentUser(user)" #append>
+              <UserEditDialog v-if="editUserAvailable" :user="user" />
+              <ConfirmDialog
+                v-if="deleteUserAvailable"
+                :title="$t('wallet.removeUserTitle')"
+                :message="$t('wallet.removeUserMessage')"
+                :confirm="() => removeUser(user.user_id)"
+              >
+                <template #activator="{ props: activatorProps }">
+                  <v-btn
+                    v-bind="activatorProps"
+                    color="error"
+                    icon="mdi-account-remove"
+                    variant="text"
+                  ></v-btn>
+                </template>
+              </ConfirmDialog>
             </template>
           </v-list-item>
         </template>

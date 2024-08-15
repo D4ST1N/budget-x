@@ -2,14 +2,22 @@ import WalletCreation from "@/components/Wallet/WalletCreation.vue";
 import WalletEditor from "@/components/Wallet/WalletEditor.vue";
 import WalletJoin from "@/components/Wallet/WalletJoin.vue";
 import WalletShare from "@/components/Wallet/WalletShare.vue";
+import { hasAccess } from "@/helpers/utils";
 import { useUserStore } from "@/store/user";
+import { useWalletStore } from "@/store/wallets";
+import { AccessLevel } from "@/types/AccessLevel";
 import HomeView from "@/views/HomeView.vue";
 import LoginView from "@/views/LoginView.vue";
 import StatisticView from "@/views/StatisticView.vue";
 import UserProfileView from "@/views/UserProfileView.vue";
 import WalletView from "@/views/WalletView.vue";
 import { storeToRefs } from "pinia";
-import { createRouter, createWebHistory } from "vue-router";
+import {
+  createRouter,
+  createWebHistory,
+  NavigationGuardNext,
+  RouteLocationNormalized,
+} from "vue-router";
 
 const routes = [
   {
@@ -55,6 +63,8 @@ const routes = [
         component: WalletEditor,
         meta: {
           titleKey: "wallet.editWallet",
+          accessLevel: [AccessLevel.Edit, AccessLevel.Delete],
+          accessOperator: "OR",
         },
       },
       {
@@ -63,6 +73,7 @@ const routes = [
         component: WalletShare,
         meta: {
           titleKey: "wallet.shareWallet",
+          accessLevel: [AccessLevel.ShareWallet],
         },
       },
       {
@@ -81,6 +92,11 @@ const routes = [
     },
   },
   {
+    path: "/no-access",
+    name: "NoAccess",
+    component: () => import("@/views/AccessDeniedView.vue"),
+  },
+  {
     path: "/login",
     name: "Login",
     component: LoginView,
@@ -92,57 +108,104 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to, _from, next) => {
-  const userStore = useUserStore();
-  const { isVerificationNeeded } = storeToRefs(userStore);
+async function checkAuth(
+  to: RouteLocationNormalized,
+  _from: RouteLocationNormalized,
+  next: NavigationGuardNext
+): Promise<boolean> {
+  const token = localStorage.getItem("session_token");
 
+  if (to.meta.authRequired && !token) {
+    localStorage.setItem("redirectAfterLogin", to.fullPath);
+    next("/login");
+    return false;
+  }
+
+  if (to.meta.authRequired && token) {
+    const isLoginPage = to.name === "Login";
+
+    if (isLoginPage) {
+      return await verifyUser(
+        token,
+        () => {
+          next("/");
+
+          return true;
+        },
+        () => {
+          next();
+
+          return false;
+        }
+      );
+    } else {
+      return await verifyUser(
+        token,
+        () => {
+          return true;
+        },
+        () => {
+          localStorage.removeItem("session_token");
+          localStorage.setItem("redirectAfterLogin", to.fullPath);
+          next("/login");
+
+          return false;
+        }
+      );
+    }
+  }
+
+  return true;
+}
+
+async function verifyUser(
+  token: string,
+  success: () => boolean,
+  failure: () => boolean
+): Promise<boolean> {
+  const userStore = useUserStore();
+  const response = await userStore.verifyUser(token);
+
+  if (response.success) {
+    return success();
+  }
+
+  return failure();
+}
+
+router.beforeEach(async (to, from, next) => {
   if (to.query.session_token) {
     localStorage.setItem("session_token", String(to.query.session_token));
-    router.replace({ query: undefined });
+    const redirectUrl = localStorage.getItem("redirectAfterLogin") || "/";
+    localStorage.removeItem("redirectAfterLogin");
+    router.replace({ path: redirectUrl, query: undefined });
   }
 
-  const token = localStorage.getItem("session_token");
-  const isLoginPage = to.name === "Login";
+  await checkAuth(to, from, next);
+  const isWalletPage = to.matched.some((record) => record.name === "Wallet");
 
-  if (isLoginPage) {
-    if (token) {
-      if (isVerificationNeeded.value) {
-        const response = await userStore.verifyUser(token);
-
-        if (response.success) {
-          next("/");
-          return;
-        }
-
-        next();
-        return;
-      }
-    } else {
-      next();
-      return;
-    }
+  if (!isWalletPage || !to.meta.accessLevel) {
+    next();
+    return;
   }
 
-  const { authRequired } = to.meta;
+  const walletStore = useWalletStore();
 
-  if (authRequired) {
-    if (token) {
-      if (isVerificationNeeded.value) {
-        const response = await userStore.verifyUser(token);
+  await walletStore.waitForAccessLevelsLoaded();
 
-        if (!response.success) {
-          localStorage.removeItem("session_token");
-          next("/login");
-          return;
-        }
-      }
-    } else {
-      next("/login");
-      return;
-    }
+  const { currentAccessLevel } = storeToRefs(walletStore);
+
+  if (
+    hasAccess(
+      to.meta.accessLevel as AccessLevel[],
+      currentAccessLevel.value,
+      (to.meta.accessOperator as "OR" | "AND") || "AND"
+    )
+  ) {
+    next();
+  } else {
+    next("/no-access");
   }
-
-  next();
 });
 
 export default router;

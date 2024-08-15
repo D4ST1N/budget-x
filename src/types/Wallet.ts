@@ -1,10 +1,15 @@
 import { SuccessServerResponse } from "@/types/ServerResponse";
+
+import { AccessLevel } from "./AccessLevel";
 import { UserData } from "./User";
 
 export interface WalletData {
   name: string;
   creator: string;
-  allowedUsers: string[];
+  allowedUsers: {
+    userId: string;
+    accessLevels: AccessLevel[];
+  }[];
 }
 
 export interface Wallet extends WalletData {

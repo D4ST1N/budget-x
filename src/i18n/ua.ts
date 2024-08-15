@@ -3,7 +3,25 @@ export default {
   ui: {
     save: "Зберегти",
     delete: "Видалити",
+    confirm: "Підтвердити",
+    cancel: "Скасувати",
     goHome: "На головну",
+    accessDenied: "Доступ заборонено",
+    noPermission: "У вас немає доступу до цієї сторінки",
+  },
+  unit: {
+    hour: "Година",
+    minute: "Хвилина",
+  },
+  accessLevel: {
+    View: "Перегляд",
+    Edit: "Редагування",
+    AddCategories: "Додавання категорій",
+    AddExpenses: "Додавання витрат",
+    DeleteCategories: "Видалення категорій",
+    Delete: "Видалення",
+    ShareWallet: "Поділитись гаманцем",
+    DeleteUsers: "Видалення користувачів",
   },
   validation: {
     fieldIsRequired: "Обов'язкове поле",
@@ -16,6 +34,7 @@ export default {
     textCopyFailed: "Сталась помилка при копіюванні тексту",
     walletJoined: "Успішно приєднано до гаманця",
     userRemoved: "Доступ до гаманця для користувача забрано",
+    userEdited: "Доступ до гаманця для користувача змінено",
   },
   errors: {
     NoTokenProvided: "Помилка авторизації. Будь ласка, спробуйте ще раз",
@@ -60,6 +79,17 @@ export default {
     noUserAdded:
       "Жодного користувача не додано до гаманця. Згенеруйте посилання, щоб поділитись гаманцем",
     joiningWallet: "Запрошує Вас приєднатись до гаманця",
+    removeUserTitle: "Видалити користувача з гаманця",
+    removeUserMessage: "Ви впевнені, що хочете видалити користувача з гаманця?",
+    removeWalletTitle: "Видалити гаманець",
+    removeWalletMessage: "Ви впевнені, що хочете видалити гаманець?",
+    generateLinkTitle: "Налаштування посилання",
+    expireTime: "Час дії посилання",
+    expireTimeUnit: "Одиниця виміру",
+    activationCount: "Кількість активацій",
+    accessLevels: "Рівні доступу",
+    generate: "Згенерувати",
+    editAccess: "Редагувати доступ",
   },
   login: {
     title: "Авторизація",

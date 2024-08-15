@@ -22,5 +22,8 @@ export const joinWallet = (token: string) => `/wallet/join/${token}`;
 
 export const getWalletUsers = (walletId: string) => `/wallet/${walletId}/users`;
 
+export const editWalletUser = (walletId: string, userId: string) =>
+  `/wallet/${walletId}/users/${userId}`;
+
 export const removeWalletUser = (walletId: string, userId: string) =>
   `/wallet/${walletId}/users/${userId}`;

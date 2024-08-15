@@ -5,8 +5,8 @@ import WalletActions from "./WalletActions.vue";
 </script>
 
 <template>
-  <WalletActions :class="$style.header" />
   <div :class="$style.container">
+    <WalletActions :class="$style.header" />
     <Expenses :class="$style.main" />
     <DashboardPanel v-ripple :class="$style.expense">
       <div :class="$style.tileButton">
@@ -27,16 +27,21 @@ import WalletActions from "./WalletActions.vue";
 .container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 140px;
   grid-template-areas:
     "main main"
-    "main main"
-    "main main"
-    "main main"
     "expense income";
-  height: calc(100% - 60px);
+  height: 100%;
   padding: 6px;
-  gap: 12px;
+  gap: 6px;
+
+  &:has(.header:first-child) {
+    grid-template-rows: 36px 1fr 140px;
+    grid-template-areas:
+      "header header"
+      "main main"
+      "expense income";
+  }
 }
 
 .header {

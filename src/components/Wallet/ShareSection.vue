@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useNotificationStore } from "@/store/notification";
 import { useWalletStore } from "@/store/wallets";
+import { InvitationOptions } from "@/types/Invitation";
 import { NotificationType } from "@/types/Notification";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import ShareLinkDialog from "../ShareLinkDialog/ShareLinkDialog.vue";
 
 const i18n = useI18n();
 
@@ -11,8 +13,8 @@ const notificationStore = useNotificationStore();
 const walletsStore = useWalletStore();
 const shareLink = ref<string>("");
 
-async function generateShareToken() {
-  const token = await walletsStore.shareWallet();
+async function generateShareToken(invitationOptions: InvitationOptions) {
+  const token = await walletsStore.shareWallet(invitationOptions);
 
   if (token) {
     const baseAppUrl = new URL(import.meta.env.BASE_URL, import.meta.url).href;
@@ -38,12 +40,8 @@ async function copyClick() {
 </script>
 
 <template>
-  <v-btn variant="text" @click="generateShareToken">
-    <template #prepend>
-      <v-icon>mdi-link-plus</v-icon>
-    </template>
-    {{ $t("wallet.generateLink") }}
-  </v-btn>
+  <ShareLinkDialog @submit="generateShareToken" />
+
   <div v-if="shareLink" :class="$style.fieldWrapper">
     <v-text-field
       :value="shareLink"

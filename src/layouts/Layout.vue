@@ -2,6 +2,14 @@
 import WalletList from "@/components/WalletList/WalletList.vue";
 import { onMounted } from "vue";
 
+const props = withDefaults(
+  defineProps<{
+    appBar?: boolean;
+  }>(),
+  {
+    appBar: true,
+  }
+);
 const emit = defineEmits(["mounted"]);
 
 onMounted(() => {
@@ -11,7 +19,7 @@ onMounted(() => {
 
 <template>
   <v-app>
-    <v-app-bar>
+    <v-app-bar v-if="props.appBar">
       <template #prepend>
         <slot name="app-bar-prepend">
           <v-app-bar-title :class="$style.toolbarTitle">
