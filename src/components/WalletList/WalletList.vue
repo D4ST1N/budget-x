@@ -4,8 +4,7 @@ import { storeToRefs } from "pinia";
 import { computed } from "vue";
 
 const walletsStore = useWalletStore();
-const { wallets, sharedWallets, currentWallet, selectedWallet } =
-  storeToRefs(walletsStore);
+const { wallets, sharedWallets, currentWallet } = storeToRefs(walletsStore);
 
 const myWallets = computed(() => {
   return wallets.value.map((wallet) => {
@@ -30,7 +29,7 @@ const allWallets = computed(() => {
 });
 
 function selectWallet(walletId: string) {
-  selectedWallet.value = walletId;
+  walletsStore.selectWallet(walletId);
 }
 </script>
 
@@ -39,16 +38,18 @@ function selectWallet(walletId: string) {
     <template #activator="{ props }">
       <v-btn color="primary" variant="text" v-bind="props">
         <span :class="$style.truncate">{{ currentWallet?.name }}</span>
+
         <template #append>
           <v-icon>mdi-menu-down</v-icon>
         </template>
       </v-btn>
     </template>
+
     <v-list>
       <template v-if="myWallets.length">
-        <v-list-subheader color="primary">{{
-          $t("wallet.myWallets")
-        }}</v-list-subheader>
+        <v-list-subheader color="primary">
+          {{ $t("wallet.myWallets") }}
+        </v-list-subheader>
 
         <v-list-item
           v-for="wallet in myWallets"
@@ -65,9 +66,9 @@ function selectWallet(walletId: string) {
       ></v-divider>
 
       <template v-if="otherWallets.length">
-        <v-list-subheader color="primary">{{
-          $t("wallet.sharedWallets")
-        }}</v-list-subheader>
+        <v-list-subheader color="primary">
+          {{ $t("wallet.sharedWallets") }}
+        </v-list-subheader>
 
         <v-list-item
           v-for="wallet in otherWallets"

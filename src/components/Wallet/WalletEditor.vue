@@ -6,7 +6,8 @@ import { AccessLevel } from "@/types/AccessLevel";
 import { Wallet } from "@/types/Wallet";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
-import ConfirmDialog from "../Dialog/ConfirmDialog.vue";
+
+const emit = defineEmits(["on-save"]);
 
 const walletStore = useWalletStore();
 const { currentWallet, currentAccessLevel } = storeToRefs(walletStore);
@@ -19,26 +20,23 @@ const editAvailable = computed(() =>
   hasAccess([AccessLevel.Edit], currentAccessLevel.value)
 );
 
-const deleteAvailable = computed(() =>
-  hasAccess([AccessLevel.Delete], currentAccessLevel.value)
-);
-
 const isChanged = computed(
   () => JSON.stringify(currentWallet.value) !== JSON.stringify(newWallet.value)
 );
 
 function updateWallet() {
   walletStore.updateWalletName(newWallet.value as Wallet);
-}
-
-function deleteWallet() {
-  walletStore.deleteWallet();
+  emit("on-save");
 }
 </script>
 
 <template>
-  <v-card-text>
-    <v-form v-model="valid" @submit.prevent="updateWallet">
+  <v-card-text :class="$style.pageContainer">
+    <v-form
+      v-model="valid"
+      :class="$style.editForm"
+      @submit.prevent="updateWallet"
+    >
       <v-text-field
         v-model="newWallet.name"
         :label="$t('wallet.walletName')"
@@ -46,9 +44,8 @@ function deleteWallet() {
         :readonly="!editAvailable"
         :rules="[requiredField]"
       ></v-text-field>
-      <br />
 
-      <v-divider></v-divider>
+      <br />
 
       <div :class="$style.actions">
         <v-btn
@@ -60,18 +57,7 @@ function deleteWallet() {
         >
           {{ $t("ui.save") }}
         </v-btn>
-        <ConfirmDialog
-          v-if="deleteAvailable"
-          :title="$t('wallet.removeWalletTitle')"
-          :message="$t('wallet.removeWalletMessage')"
-          :confirm="deleteWallet"
-        >
-          <template #activator="{ props: activatorProps }">
-            <v-btn v-bind="activatorProps" variant="text" color="error">
-              {{ $t("ui.delete") }}
-            </v-btn>
-          </template>
-        </ConfirmDialog>
+        <slot name="actions" />
       </div>
     </v-form>
   </v-card-text>
@@ -81,6 +67,5 @@ function deleteWallet() {
 .actions {
   display: flex;
   justify-content: space-between;
-  padding: 16px 0;
 }
 </style>

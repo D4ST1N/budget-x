@@ -1,12 +1,16 @@
 import {
   addWallet,
+  addWalletCategory,
+  deleteWalletCategory,
   deleteWallet as deleteWalletUrl,
   editWalletUser as editWalletUserUrl,
   getInvite,
+  getWalletCategories,
   getWallets,
   getWalletUsers,
   removeWalletUser,
   updateWallet,
+  updateWalletCategory,
 } from "@/helpers/serverUrls";
 import { fetchUserAvatar } from "@/helpers/utils";
 import { api } from "@/plugins/axios";
@@ -14,11 +18,13 @@ import i18n from "@/plugins/i18n";
 import { useNotificationStore } from "@/store/notification";
 import { useUserStore } from "@/store/user";
 import { AccessLevel } from "@/types/AccessLevel";
+import { Category, CategoryData, CategoryTreeElement } from "@/types/Category";
 import { InvitationOptions } from "@/types/Invitation";
 import { NotificationType } from "@/types/Notification";
 import { ServerResponse, ServerResponseError } from "@/types/ServerResponse";
 import { UserData } from "@/types/User";
 import {
+  SuccessWalletCategoriesFetchResponse,
   SuccessWalletCreationResponse,
   SuccessWalletFetchResponse,
   SuccessWalletShareResponse,
@@ -40,6 +46,7 @@ export const useWalletStore = defineStore(
     const sharedUsers = ref<UserData[]>([]);
     const fetchingWalletUsers = ref<boolean>(false);
     const walletFetched = ref<boolean>(false);
+    const categories = ref<Category[]>([]);
 
     const router = useRouter();
 
@@ -74,6 +81,43 @@ export const useWalletStore = defineStore(
       return [];
     });
 
+    const allWallets = computed(() => [
+      ...wallets.value,
+      ...sharedWallets.value,
+    ]);
+
+    const rootCategories = computed(() => {
+      return categories.value.filter((category) => !category.parentCategory);
+    });
+
+    const categoriesTree = computed(() => {
+      const categoryMap = new Map<string, CategoryTreeElement>();
+
+      categories.value.forEach((category) => {
+        categoryMap.set(category._id, { ...category, subCategories: [] });
+      });
+
+      const rootCategories: CategoryTreeElement[] = [];
+
+      categoryMap.forEach((category) => {
+        if (category.parentCategory) {
+          const parentCategory = categoryMap.get(category.parentCategory);
+          parentCategory?.subCategories.push(category);
+        } else {
+          rootCategories.push(category);
+        }
+      });
+
+      return rootCategories;
+    });
+
+    function selectWallet(walletId: string) {
+      if (!allWallets.value.some((wallet) => wallet._id === walletId)) return;
+
+      selectedWallet.value = walletId;
+      fetchWalletCategories();
+    }
+
     function waitForAccessLevelsLoaded(): Promise<void> {
       return new Promise((resolve) => {
         const checkLoaded = () => {
@@ -88,6 +132,8 @@ export const useWalletStore = defineStore(
     }
 
     async function fetchWallets() {
+      if (!user.value) return;
+
       const response: AxiosResponse<
         SuccessWalletFetchResponse | ServerResponseError
       > = await api.get(getWallets(user.value!.user_id));
@@ -108,6 +154,10 @@ export const useWalletStore = defineStore(
         if (!selectedWallet.value && allWallets.length > 0) {
           selectedWallet.value = allWallets[0]._id;
         }
+
+        if (selectedWallet.value) {
+          await fetchWalletCategories();
+        }
       } else {
         notificationStore.add({
           text: i18n.global.t(`errors.${response.data.errorType}`),
@@ -116,6 +166,23 @@ export const useWalletStore = defineStore(
       }
 
       walletFetched.value = true;
+    }
+
+    async function fetchWalletCategories() {
+      if (!selectedWallet.value) return;
+
+      const response: AxiosResponse<
+        SuccessWalletCategoriesFetchResponse | ServerResponseError
+      > = await api.get(getWalletCategories(selectedWallet.value));
+
+      if (response.data.success) {
+        categories.value = response.data.categories;
+      } else {
+        notificationStore.add({
+          text: i18n.global.t(`errors.${response.data.errorType}`),
+          type: NotificationType.Error,
+        });
+      }
     }
 
     async function createWallet(walletName: string) {
@@ -141,6 +208,93 @@ export const useWalletStore = defineStore(
           type: NotificationType.Error,
         });
       }
+    }
+
+    async function createCategory(categoryData: CategoryData) {
+      if (!selectedWallet.value) return false;
+
+      const response: AxiosResponse<ServerResponse> = await api.post(
+        addWalletCategory(selectedWallet.value),
+        JSON.stringify({
+          ...categoryData,
+          walletId: selectedWallet.value,
+        })
+      );
+
+      if (response.data.success) {
+        fetchWalletCategories();
+        notificationStore.add({
+          text: i18n.global.t("notification.categoryAdded", {
+            categoryName: categoryData.name,
+          }),
+          type: NotificationType.Success,
+        });
+
+        return true;
+      }
+
+      notificationStore.add({
+        text: i18n.global.t(`errors.${response.data.errorType}`),
+        type: NotificationType.Error,
+      });
+
+      return false;
+    }
+
+    async function updateCategory(
+      updatedCategoryData: CategoryData,
+      categoryId: string
+    ) {
+      if (!selectedWallet.value) return false;
+
+      const response: AxiosResponse<ServerResponse> = await api.patch(
+        updateWalletCategory(selectedWallet.value, categoryId),
+        JSON.stringify(updatedCategoryData)
+      );
+
+      if (response.data.success) {
+        fetchWalletCategories();
+        notificationStore.add({
+          text: i18n.global.t("notification.categoryUpdated", {
+            categoryName: updatedCategoryData.name,
+          }),
+          type: NotificationType.Success,
+        });
+
+        return true;
+      }
+
+      notificationStore.add({
+        text: i18n.global.t(`errors.${response.data.errorType}`),
+        type: NotificationType.Error,
+      });
+
+      return false;
+    }
+
+    async function deleteCategory(categoryId: string) {
+      if (!selectedWallet.value) return false;
+
+      const response: AxiosResponse<ServerResponse> = await api.delete(
+        deleteWalletCategory(selectedWallet.value, categoryId)
+      );
+
+      if (response.data.success) {
+        fetchWalletCategories();
+        notificationStore.add({
+          text: i18n.global.t("notification.categoryDeleted"),
+          type: NotificationType.Success,
+        });
+
+        return true;
+      }
+
+      notificationStore.add({
+        text: i18n.global.t(`errors.${response.data.errorType}`),
+        type: NotificationType.Error,
+      });
+
+      return false;
     }
 
     async function updateWalletName(updatedWallet: Wallet) {
@@ -296,9 +450,16 @@ export const useWalletStore = defineStore(
       currentWallet,
       currentAccessLevel,
       fetchingWalletUsers,
+      categories,
+      rootCategories,
+      categoriesTree,
+      selectWallet,
       waitForAccessLevelsLoaded,
       fetchWallets,
       createWallet,
+      createCategory,
+      updateCategory,
+      deleteCategory,
       updateWalletName,
       deleteWallet,
       shareWallet,

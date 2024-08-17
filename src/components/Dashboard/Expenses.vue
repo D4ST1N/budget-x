@@ -52,7 +52,8 @@ const options = {
 
 <template>
   <DashboardPanel :class="$style.container">
-    <highcharts :options="options"></highcharts>
+    <slot />
+    <highcharts :options="options" :class="$style.chart"></highcharts>
     <v-btn variant="text" :to="{ name: 'Statistic' }">
       <template #prepend>
         <v-icon>mdi-chart-bar-stacked</v-icon>
@@ -64,10 +65,13 @@ const options = {
 
 <style lang="scss" module>
 .container {
-  padding: 24px 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
+}
+
+.chart {
+  margin-top: 12px;
 }
 </style>

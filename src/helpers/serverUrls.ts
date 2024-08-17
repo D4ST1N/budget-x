@@ -27,3 +27,15 @@ export const editWalletUser = (walletId: string, userId: string) =>
 
 export const removeWalletUser = (walletId: string, userId: string) =>
   `/wallet/${walletId}/users/${userId}`;
+
+export const getWalletCategories = (walletId: string) =>
+  `/wallet/${walletId}/category`;
+
+export const addWalletCategory = (walletId: string) =>
+  `/wallet/${walletId}/category`;
+
+export const updateWalletCategory = (walletId: string, categoryId: string) =>
+  `/wallet/${walletId}/category/${categoryId}`;
+
+export const deleteWalletCategory = (walletId: string, categoryId: string) =>
+  `/wallet/${walletId}/category/${categoryId}`;

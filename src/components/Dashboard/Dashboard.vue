@@ -1,19 +1,48 @@
 <script setup lang="ts">
+import WalletSettings from "@/components/Wallet/WalletSettings.vue";
+import { useWalletStore } from "@/store/wallets";
+import { storeToRefs } from "pinia";
+import { computed } from "vue";
 import DashboardPanel from "./DashboardPanel.vue";
 import Expenses from "./Expenses.vue";
-import WalletActions from "./WalletActions.vue";
+
+const walletStore = useWalletStore();
+const { categories } = storeToRefs(walletStore);
+
+const noCategoriesAdded = computed(() => categories.value.length === 0);
 </script>
 
 <template>
   <div :class="$style.container">
-    <WalletActions :class="$style.header" />
-    <Expenses :class="$style.main" />
+    <WalletSettings :class="$style.header" />
+
+    <Expenses :class="$style.main">
+      <v-alert
+        v-if="noCategoriesAdded"
+        type="info"
+        variant="tonal"
+        density="compact"
+        :class="$style.badge"
+      >
+        {{ $t("category.noCategoriesAdded") }}
+        <div :class="$style.badgeActions">
+          <v-btn color="primary" variant="text" :to="{ name: 'Categories' }">
+            <template #prepend>
+              <v-icon>mdi-expand-all</v-icon>
+            </template>
+            {{ $t("category.addCategories") }}
+          </v-btn>
+        </div>
+      </v-alert>
+    </Expenses>
+
     <DashboardPanel v-ripple :class="$style.expense">
       <div :class="$style.tileButton">
         <v-icon size="48">mdi-cash</v-icon>
         <span>{{ $t("wallet.addExpense") }}</span>
       </div>
     </DashboardPanel>
+
     <DashboardPanel v-ripple :class="$style.income">
       <div :class="$style.tileButton">
         <v-icon size="48">mdi-piggy-bank</v-icon>
@@ -68,5 +97,17 @@ import WalletActions from "./WalletActions.vue";
   cursor: pointer;
   color: rgba(var(--v-theme-primary));
   height: 100%;
+}
+
+.badge {
+  :global(.v-alert__prepend) {
+    margin-top: 12px;
+    align-self: center;
+  }
+}
+
+.badgeActions {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

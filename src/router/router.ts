@@ -85,6 +85,15 @@ const routes = [
           showBackButton: false,
         },
       },
+      {
+        path: "categories",
+        name: "Categories",
+        component: () => import("@/components/Category/CategoriesList.vue"),
+        meta: {
+          titleKey: "category.categories",
+          accessLevel: [AccessLevel.View],
+        },
+      },
     ],
     meta: {
       authRequired: true,
