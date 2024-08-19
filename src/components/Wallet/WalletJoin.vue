@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getInvitationInfo, joinWallet } from "@/helpers/serverUrls";
+import { getInvitationInfoUrl, joinWalletUrl } from "@/helpers/serverUrls";
 import { fetchUserAvatar } from "@/helpers/utils";
 import { api } from "@/plugins/axios";
 import { useNotificationStore } from "@/store/notification";
@@ -40,7 +40,7 @@ async function fetchInvitationInfo() {
   try {
     const response: AxiosResponse<
       SuccessInvitationInfoResponse | ServerResponseError
-    > = await api.get(getInvitationInfo(token));
+    > = await api.get(getInvitationInfoUrl(token));
     loading.value = false;
 
     if (response.data.success) {
@@ -62,7 +62,7 @@ async function fetchInvitationInfo() {
 async function tryToJoin() {
   loading.value = true;
   try {
-    const response = await api.post(joinWallet(token), {
+    const response = await api.post(joinWalletUrl(token), {
       userId: user.value?.user_id,
     });
     loading.value = false;

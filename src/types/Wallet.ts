@@ -1,7 +1,6 @@
 import { SuccessServerResponse } from "@/types/ServerResponse";
 
 import { AccessLevel } from "./AccessLevel";
-import { Category } from "./Category";
 import { UserData } from "./User";
 
 export interface WalletData {
@@ -38,9 +37,4 @@ export interface SuccessWalletUsersFetchResponse extends SuccessServerResponse {
 export interface SuccessInvitationInfoResponse extends SuccessServerResponse {
   walletName: string;
   creator: UserData;
-}
-
-export interface SuccessWalletCategoriesFetchResponse
-  extends SuccessServerResponse {
-  categories: Category[];
 }

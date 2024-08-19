@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useWalletStore } from "@/store/wallets";
+import { useWalletStore } from "@/store/wallet";
 import { computed } from "vue";
 
 const props = defineProps({

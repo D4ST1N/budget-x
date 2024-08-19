@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { required } from "@/helpers/inputValidations";
-import { useWalletStore } from "@/store/wallets";
+import { useWalletStore } from "@/store/wallet";
 import { ref } from "vue";
 
 const walletStore = useWalletStore();

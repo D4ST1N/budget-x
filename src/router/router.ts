@@ -3,7 +3,7 @@ import WalletEditor from "@/components/Wallet/WalletEditor.vue";
 import WalletJoin from "@/components/Wallet/WalletJoin.vue";
 import { hasAccess } from "@/helpers/utils";
 import { useUserStore } from "@/store/user";
-import { useWalletStore } from "@/store/wallets";
+import { useWalletStore } from "@/store/wallet";
 import { AccessLevel } from "@/types/AccessLevel";
 import HomeView from "@/views/HomeView.vue";
 import LoginView from "@/views/LoginView.vue";
@@ -91,6 +91,15 @@ const routes = [
         meta: {
           titleKey: "users.users",
           accessLevel: [AccessLevel.View],
+        },
+      },
+      {
+        path: "tags",
+        name: "Tags",
+        component: () => import("@/components/Tag/TagsList.vue"),
+        meta: {
+          titleKey: "tag.tags",
+          accessLevel: [AccessLevel.ManageTags],
         },
       },
     ],

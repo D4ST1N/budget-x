@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ShareLinkDialog from "@/components/ShareLinkDialog/ShareLinkDialog.vue";
 import { hasAccess } from "@/helpers/utils";
-import { useWalletStore } from "@/store/wallets";
+import { useWalletStore } from "@/store/wallet";
 import { AccessLevel } from "@/types/AccessLevel";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
@@ -39,6 +39,15 @@ const items = computed(() => [
     color: "primary",
     onSelect: () => {
       router.push({ name: "Categories" });
+    },
+  },
+  {
+    title: t("tag.editTags"),
+    icon: "mdi-tag-multiple",
+    hasAccess: hasAccess([AccessLevel.ManageTags], currentAccessLevel.value),
+    color: "primary",
+    onSelect: () => {
+      router.push({ name: "Tags" });
     },
   },
   {

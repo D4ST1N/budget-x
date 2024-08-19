@@ -3,7 +3,7 @@ import ConfirmDialog from "@/components/Dialog/ConfirmDialog.vue";
 import UserEditDialog from "@/components/UserEditDialog/UserEditDialog.vue";
 import { hasAccess } from "@/helpers/utils";
 import { useUserStore } from "@/store/user";
-import { useWalletStore } from "@/store/wallets";
+import { useWalletStore } from "@/store/wallet";
 import { AccessLevel } from "@/types/AccessLevel";
 import { UserData } from "@/types/User";
 import { storeToRefs } from "pinia";

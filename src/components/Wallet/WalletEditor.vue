@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { required } from "@/helpers/inputValidations";
 import { hasAccess } from "@/helpers/utils";
-import { useWalletStore } from "@/store/wallets";
+import { useWalletStore } from "@/store/wallet";
 import { AccessLevel } from "@/types/AccessLevel";
 import { Wallet } from "@/types/Wallet";
 import { storeToRefs } from "pinia";

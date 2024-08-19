@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AccessEditor from "@/components/AccessEditor/AccessEditor.vue";
 import { useNotificationStore } from "@/store/notification";
-import { useWalletStore } from "@/store/wallets";
+import { useWalletStore } from "@/store/wallet";
 import { AccessLevel } from "@/types/AccessLevel";
 import { InvitationOptions } from "@/types/Invitation";
 import { NotificationType } from "@/types/Notification";

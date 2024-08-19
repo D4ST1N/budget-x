@@ -1,16 +1,20 @@
 import {
-  addWallet,
-  addWalletCategory,
-  deleteWalletCategory,
-  deleteWallet as deleteWalletUrl,
-  editWalletUser as editWalletUserUrl,
-  getInvite,
-  getWalletCategories,
-  getWallets,
-  getWalletUsers,
-  removeWalletUser,
-  updateWallet,
-  updateWalletCategory,
+  addWalletCategoryUrl,
+  addWalletTagUrl,
+  addWalletUrl,
+  deleteWalletCategoryUrl,
+  deleteWalletTagUrl,
+  deleteWalletUrl,
+  deleteWalletUserUrl,
+  getInvitationLinkUrl,
+  getWalletCategoriesUrl,
+  getWalletsUrl,
+  getWalletTagsUrl,
+  getWalletUsersUrl,
+  updateWalletCategoryUrl,
+  updateWalletTagUrl,
+  updateWalletUrl,
+  updateWalletUserUrl,
 } from "@/helpers/serverUrls";
 import { fetchUserAvatar } from "@/helpers/utils";
 import { api } from "@/plugins/axios";
@@ -18,13 +22,18 @@ import i18n from "@/plugins/i18n";
 import { useNotificationStore } from "@/store/notification";
 import { useUserStore } from "@/store/user";
 import { AccessLevel } from "@/types/AccessLevel";
-import { Category, CategoryData, CategoryTreeElement } from "@/types/Category";
+import {
+  Category,
+  CategoryData,
+  CategoryTreeElement,
+  SuccessWalletCategoriesFetchResponse,
+} from "@/types/Category";
 import { InvitationOptions } from "@/types/Invitation";
 import { NotificationType } from "@/types/Notification";
 import { ServerResponse, ServerResponseError } from "@/types/ServerResponse";
+import { SuccessWalletTagsFetchResponse, Tag, TagData } from "@/types/Tag";
 import { UserData } from "@/types/User";
 import {
-  SuccessWalletCategoriesFetchResponse,
   SuccessWalletCreationResponse,
   SuccessWalletFetchResponse,
   SuccessWalletShareResponse,
@@ -47,6 +56,7 @@ export const useWalletStore = defineStore(
     const fetchingWalletUsers = ref<boolean>(false);
     const walletFetched = ref<boolean>(false);
     const categories = ref<Category[]>([]);
+    const tags = ref<Tag[]>([]);
 
     const router = useRouter();
 
@@ -116,6 +126,7 @@ export const useWalletStore = defineStore(
 
       selectedWallet.value = walletId;
       fetchWalletCategories();
+      fetchWalletTags();
     }
 
     function waitForAccessLevelsLoaded(): Promise<void> {
@@ -136,7 +147,7 @@ export const useWalletStore = defineStore(
 
       const response: AxiosResponse<
         SuccessWalletFetchResponse | ServerResponseError
-      > = await api.get(getWallets(user.value!.user_id));
+      > = await api.get(getWalletsUrl(user.value!.user_id));
 
       if (response.data.success) {
         wallets.value = response.data.wallets;
@@ -156,7 +167,8 @@ export const useWalletStore = defineStore(
         }
 
         if (selectedWallet.value) {
-          await fetchWalletCategories();
+          fetchWalletCategories();
+          fetchWalletTags();
         }
       } else {
         notificationStore.add({
@@ -173,10 +185,27 @@ export const useWalletStore = defineStore(
 
       const response: AxiosResponse<
         SuccessWalletCategoriesFetchResponse | ServerResponseError
-      > = await api.get(getWalletCategories(selectedWallet.value));
+      > = await api.get(getWalletCategoriesUrl(selectedWallet.value));
 
       if (response.data.success) {
         categories.value = response.data.categories;
+      } else {
+        notificationStore.add({
+          text: i18n.global.t(`errors.${response.data.errorType}`),
+          type: NotificationType.Error,
+        });
+      }
+    }
+
+    async function fetchWalletTags() {
+      if (!selectedWallet.value) return;
+
+      const response: AxiosResponse<
+        SuccessWalletTagsFetchResponse | ServerResponseError
+      > = await api.get(getWalletTagsUrl(selectedWallet.value));
+
+      if (response.data.success) {
+        tags.value = response.data.tags;
       } else {
         notificationStore.add({
           text: i18n.global.t(`errors.${response.data.errorType}`),
@@ -193,7 +222,7 @@ export const useWalletStore = defineStore(
       };
       const response: AxiosResponse<
         SuccessWalletCreationResponse | ServerResponseError
-      > = await api.post(addWallet(), JSON.stringify(walletData));
+      > = await api.post(addWalletUrl(), JSON.stringify(walletData));
 
       if (response.data.success) {
         fetchWallets();
@@ -214,7 +243,7 @@ export const useWalletStore = defineStore(
       if (!selectedWallet.value) return false;
 
       const response: AxiosResponse<ServerResponse> = await api.post(
-        addWalletCategory(selectedWallet.value),
+        addWalletCategoryUrl(selectedWallet.value),
         JSON.stringify({
           ...categoryData,
           walletId: selectedWallet.value,
@@ -248,7 +277,7 @@ export const useWalletStore = defineStore(
       if (!selectedWallet.value) return false;
 
       const response: AxiosResponse<ServerResponse> = await api.patch(
-        updateWalletCategory(selectedWallet.value, categoryId),
+        updateWalletCategoryUrl(selectedWallet.value, categoryId),
         JSON.stringify(updatedCategoryData)
       );
 
@@ -276,7 +305,7 @@ export const useWalletStore = defineStore(
       if (!selectedWallet.value) return false;
 
       const response: AxiosResponse<ServerResponse> = await api.delete(
-        deleteWalletCategory(selectedWallet.value, categoryId)
+        deleteWalletCategoryUrl(selectedWallet.value, categoryId)
       );
 
       if (response.data.success) {
@@ -297,11 +326,95 @@ export const useWalletStore = defineStore(
       return false;
     }
 
+    async function createTag(tagData: TagData) {
+      if (!selectedWallet.value) return false;
+
+      const response: AxiosResponse<ServerResponse> = await api.post(
+        addWalletTagUrl(selectedWallet.value),
+        JSON.stringify({
+          ...tagData,
+          walletId: selectedWallet.value,
+        })
+      );
+
+      if (response.data.success) {
+        fetchWalletTags();
+        notificationStore.add({
+          text: i18n.global.t("notification.tagAdded", {
+            tagName: tagData.name,
+          }),
+          type: NotificationType.Success,
+        });
+
+        return true;
+      }
+
+      notificationStore.add({
+        text: i18n.global.t(`errors.${response.data.errorType}`),
+        type: NotificationType.Error,
+      });
+
+      return false;
+    }
+
+    async function updateTag(updatedTag: TagData, tagId: string) {
+      if (!selectedWallet.value) return false;
+
+      const response: AxiosResponse<ServerResponse> = await api.patch(
+        updateWalletTagUrl(selectedWallet.value, tagId),
+        JSON.stringify(updatedTag)
+      );
+
+      if (response.data.success) {
+        fetchWalletTags();
+        notificationStore.add({
+          text: i18n.global.t("notification.tagUpdated", {
+            tagName: updatedTag.name,
+          }),
+          type: NotificationType.Success,
+        });
+
+        return true;
+      }
+
+      notificationStore.add({
+        text: i18n.global.t(`errors.${response.data.errorType}`),
+        type: NotificationType.Error,
+      });
+
+      return false;
+    }
+
+    async function deleteTag(tagId: string) {
+      if (!selectedWallet.value) return false;
+
+      const response: AxiosResponse<ServerResponse> = await api.delete(
+        deleteWalletTagUrl(selectedWallet.value, tagId)
+      );
+
+      if (response.data.success) {
+        fetchWalletTags();
+        notificationStore.add({
+          text: i18n.global.t("notification.tagDeleted"),
+          type: NotificationType.Success,
+        });
+
+        return true;
+      }
+
+      notificationStore.add({
+        text: i18n.global.t(`errors.${response.data.errorType}`),
+        type: NotificationType.Error,
+      });
+
+      return false;
+    }
+
     async function updateWalletName(updatedWallet: Wallet) {
       const response: AxiosResponse<
         SuccessWalletCreationResponse | ServerResponseError
       > = await api.patch(
-        updateWallet(updatedWallet._id),
+        updateWalletUrl(updatedWallet._id),
         JSON.stringify(updatedWallet)
       );
 
@@ -345,7 +458,7 @@ export const useWalletStore = defineStore(
       const response: AxiosResponse<
         SuccessWalletShareResponse | ServerResponseError
       > = await api.post(
-        getInvite(currentWallet.value!._id),
+        getInvitationLinkUrl(currentWallet.value!._id),
         JSON.stringify(invitationOptions)
       );
 
@@ -366,7 +479,7 @@ export const useWalletStore = defineStore(
       fetchingWalletUsers.value = true;
       const response: AxiosResponse<
         SuccessWalletUsersFetchResponse | ServerResponseError
-      > = await api.get(getWalletUsers(selectedWallet.value!));
+      > = await api.get(getWalletUsersUrl(selectedWallet.value!));
 
       if (response.data.success) {
         sharedUsers.value = await Promise.all(
@@ -392,7 +505,7 @@ export const useWalletStore = defineStore(
       if (!selectedWallet.value) return;
 
       const response: AxiosResponse<ServerResponse> = await api.patch(
-        editWalletUserUrl(selectedWallet.value, userId),
+        updateWalletUserUrl(selectedWallet.value, userId),
         JSON.stringify(accessLevels)
       );
 
@@ -412,7 +525,7 @@ export const useWalletStore = defineStore(
 
     async function deleteWalletUser(userId: string) {
       const response: AxiosResponse<ServerResponse> = await api.delete(
-        removeWalletUser(selectedWallet.value!, userId)
+        deleteWalletUserUrl(selectedWallet.value!, userId)
       );
 
       if (response.data.success) {
@@ -453,13 +566,19 @@ export const useWalletStore = defineStore(
       categories,
       rootCategories,
       categoriesTree,
+      tags,
       selectWallet,
       waitForAccessLevelsLoaded,
       fetchWallets,
+      fetchWalletCategories,
+      fetchWalletTags,
       createWallet,
       createCategory,
       updateCategory,
       deleteCategory,
+      createTag,
+      updateTag,
+      deleteTag,
       updateWalletName,
       deleteWallet,
       shareWallet,

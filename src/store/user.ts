@@ -1,5 +1,5 @@
 import { verificationInterval } from "@/config/constants";
-import { authVerify } from "@/helpers/serverUrls";
+import { verifyTokenUrl } from "@/helpers/serverUrls";
 import { fetchUserAvatar } from "@/helpers/utils";
 import { auth } from "@/plugins/axios";
 import stytch from "@/plugins/stytch";
@@ -46,7 +46,7 @@ export const useUserStore = defineStore("user", () => {
   async function verifyUser(token: string) {
     try {
       const response = await auth.post<UserVerificationResponse>(
-        authVerify(),
+        verifyTokenUrl(),
         JSON.stringify({ token })
       );
 

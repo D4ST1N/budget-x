@@ -1,52 +1,39 @@
 <script setup lang="ts">
-import EditCategoryDialog from "@/components/Category/EditCategoryDialog.vue";
+import EditTagDialog from "@/components/Tag/EditTagDialog.vue";
 import { hasAccess } from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallet";
 import { AccessLevel } from "@/types/AccessLevel";
-import { Category } from "@/types/Category";
+import { Tag } from "@/types/Tag";
 import { storeToRefs } from "pinia";
-import { computed, ref, useCssModule } from "vue";
+import { computed, ref } from "vue";
 import ConfirmDialog from "../Dialog/ConfirmDialog.vue";
 
-export interface CategoryProps {
-  subCategory?: boolean;
+export interface TagProps {
   deleteAvailable?: boolean;
-  category: Category;
+  tag: Tag;
 }
 
-const props = withDefaults(defineProps<CategoryProps>(), {
-  subCategory: false,
+const props = withDefaults(defineProps<TagProps>(), {
   deleteAvailable: true,
 });
-const styles = useCssModule();
 const walletStore = useWalletStore();
 const { currentAccessLevel } = storeToRefs(walletStore);
 
 const isEditDialogOpen = ref<boolean>(false);
 
-const categoryStyles = computed(() => ({
-  [styles.category]: true,
-  [styles.subCategory]: props.subCategory,
-}));
-
 const deleteAllowed = computed(
   () =>
-    hasAccess([AccessLevel.DeleteCategories], currentAccessLevel.value) &&
+    hasAccess([AccessLevel.ManageTags], currentAccessLevel.value) &&
     props.deleteAvailable
 );
 
-function removeCategory() {
-  walletStore.deleteCategory(props.category._id);
+function removeTag() {
+  walletStore.deleteTag(props.tag._id);
 }
 </script>
 
 <template>
-  <v-list-item
-    :title="props.category.name"
-    :density="props.subCategory ? 'compact' : 'default'"
-    :class="categoryStyles"
-    rounded
-  >
+  <v-list-item :title="props.tag.name" :class="$style.tag" rounded>
     <template #append>
       <v-btn
         icon="mdi-pencil"
@@ -57,13 +44,13 @@ function removeCategory() {
 
       <ConfirmDialog
         v-if="deleteAllowed"
-        :title="$t('category.deleteCategory')"
+        :title="$t('tag.deleteTag')"
         :message="
-          $t('category.removeCategoryMessage', {
-            category: props.category.name,
+          $t('tag.removeTagMessage', {
+            tag: props.tag.name,
           })
         "
-        :confirm="removeCategory"
+        :confirm="removeTag"
       >
         <template #activator="{ props: activatorProps }">
           <v-btn
@@ -77,20 +64,12 @@ function removeCategory() {
       </ConfirmDialog>
     </template>
 
-    <EditCategoryDialog
-      v-model:is-open="isEditDialogOpen"
-      :category="props.category"
-    />
+    <EditTagDialog v-model:is-open="isEditDialogOpen" :tag="props.tag" />
   </v-list-item>
 </template>
 
 <style lang="scss" module>
-.category {
+.tag {
   background-color: rgba(var(--v-theme-primary), 0.25);
-
-  &.subCategory {
-    margin-left: 16px;
-    background-color: rgba(var(--v-theme-primary), 0.15) !important;
-  }
 }
 </style>

@@ -3,7 +3,7 @@ import { AccessLevel } from "@/types/AccessLevel";
 import { UserData } from "@/types/User";
 import { User } from "@stytch/vanilla-js";
 
-import { getAvatar } from "./serverUrls";
+import { getUserAvatarUrl } from "./serverUrls";
 
 export function timeout(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -16,7 +16,7 @@ export async function fetchUserAvatar(
   const avatarUrl = provider.profile_picture_url;
 
   try {
-    const response = await auth.get(getAvatar(), {
+    const response = await auth.get(getUserAvatarUrl(), {
       params: {
         url: avatarUrl,
       },

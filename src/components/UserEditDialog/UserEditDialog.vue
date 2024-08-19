@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AccessEditor from "@/components/AccessEditor/AccessEditor.vue";
-import { useWalletStore } from "@/store/wallets";
+import { useWalletStore } from "@/store/wallet";
 import { AccessLevel } from "@/types/AccessLevel";
 import { UserData } from "@/types/User";
 import { storeToRefs } from "pinia";

@@ -38,6 +38,10 @@ export default {
     userEdited: "Доступ до гаманця для користувача змінено",
     categoryAdded: "Категорію {categoryName} додано",
     categoryUpdated: "Категорію {categoryName} оновлено",
+    categoryDeleted: "Категорію {categoryName} видалено",
+    tagAdded: "Тег {tagName} додано",
+    tagUpdated: "Тег {tagName} оновлено",
+    tagDeleted: "Тег {tagName} видалено",
   },
   errors: {
     NoTokenProvided: "Помилка авторизації. Будь ласка, спробуйте ще раз",
@@ -112,6 +116,15 @@ export default {
     parentCategory: "Батьківська категорія",
     noCategories: "Ще не додано жодної категорії",
     categoriesTitle: "Категорії",
+  },
+  tag: {
+    tags: "Теги",
+    editTags: "Управління тегами",
+    addTag: "Додати тег",
+    tagName: "Назва тегу",
+    deleteTag: "Видалити тег",
+    removeTagMessage: "Ви впевнені, що хочете видалити тег {tag}?",
+    editTag: "Редагувати тег",
   },
   users: {
     users: "Користувачі",

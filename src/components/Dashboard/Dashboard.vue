@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import WalletSettings from "@/components/Wallet/WalletSettings.vue";
-import { useWalletStore } from "@/store/wallets";
+import { useWalletStore } from "@/store/wallet";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import DashboardPanel from "./DashboardPanel.vue";
