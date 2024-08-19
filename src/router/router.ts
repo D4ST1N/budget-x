@@ -1,7 +1,6 @@
 import WalletCreation from "@/components/Wallet/WalletCreation.vue";
 import WalletEditor from "@/components/Wallet/WalletEditor.vue";
 import WalletJoin from "@/components/Wallet/WalletJoin.vue";
-import WalletShare from "@/components/Wallet/WalletShare.vue";
 import { hasAccess } from "@/helpers/utils";
 import { useUserStore } from "@/store/user";
 import { useWalletStore } from "@/store/wallets";
@@ -68,15 +67,6 @@ const routes = [
         },
       },
       {
-        path: "share",
-        name: "ShareWallet",
-        component: WalletShare,
-        meta: {
-          titleKey: "wallet.shareWallet",
-          accessLevel: [AccessLevel.ShareWallet],
-        },
-      },
-      {
         path: "join/:token",
         name: "JoinWallet",
         component: WalletJoin,
@@ -91,6 +81,15 @@ const routes = [
         component: () => import("@/components/Category/CategoriesList.vue"),
         meta: {
           titleKey: "category.categories",
+          accessLevel: [AccessLevel.View],
+        },
+      },
+      {
+        path: "users",
+        name: "Users",
+        component: () => import("@/components/Users/UsersList.vue"),
+        meta: {
+          titleKey: "users.users",
           accessLevel: [AccessLevel.View],
         },
       },

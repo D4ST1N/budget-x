@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import AccessEditor from "@/components/AccessEditor/AccessEditor.vue";
+import { useNotificationStore } from "@/store/notification";
 import { useWalletStore } from "@/store/wallets";
 import { AccessLevel } from "@/types/AccessLevel";
 import { InvitationOptions } from "@/types/Invitation";
+import { NotificationType } from "@/types/Notification";
 import { storeToRefs } from "pinia";
-import { ref, Ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 enum TimeUnit {
@@ -12,23 +14,34 @@ enum TimeUnit {
   Minute = "Minute",
 }
 
+const props = defineProps({
+  isOpen: Boolean,
+});
+
+const emit = defineEmits(["update:isOpen"]);
+
 const { t } = useI18n();
 
-const emit = defineEmits(["submit"]);
-
+const notificationStore = useNotificationStore();
 const walletStore = useWalletStore();
 const { currentAccessLevel } = storeToRefs(walletStore);
 const expireTime = ref<number>(1);
 const expireTimeUnit = ref<TimeUnit>(TimeUnit.Hour);
 const activationCount = ref<number>(1);
 const selectedAccessLevels = ref<AccessLevel[]>([AccessLevel.View]);
+const shareLink = ref<string>("");
 
 const unitLabels = Object.values(TimeUnit).map((unit) => ({
   label: t(`unit.${unit.toLocaleLowerCase()}`),
   value: unit,
 }));
 
-function generateLink(isActive: Ref<boolean>) {
+const showDialog = computed({
+  get: () => props.isOpen,
+  set: (value) => emit("update:isOpen", value),
+});
+
+async function generateLink() {
   const unitModifier = expireTimeUnit.value === TimeUnit.Hour ? 60 : 1;
   const expiresIn = expireTime.value * 60 * 1000 * unitModifier;
   const payload: InvitationOptions = {
@@ -37,23 +50,34 @@ function generateLink(isActive: Ref<boolean>) {
     maxUses: activationCount.value,
   };
 
-  emit("submit", payload);
-  isActive.value = false;
+  const token = await walletStore.shareWallet(payload);
+
+  if (token) {
+    const baseAppUrl = new URL(import.meta.env.BASE_URL, import.meta.url).href;
+    shareLink.value = `${baseAppUrl}wallet/join/${token}`;
+  }
+}
+
+async function copyClick() {
+  try {
+    await navigator.clipboard.writeText(shareLink.value);
+
+    notificationStore.add({
+      text: t("notification.textCopied"),
+      type: NotificationType.Success,
+    });
+  } catch (error) {
+    notificationStore.add({
+      text: t("notification.textCopyFailed"),
+      type: NotificationType.Error,
+    });
+  }
 }
 </script>
 
 <template>
-  <v-dialog>
-    <template #activator="{ props: activatorProps }">
-      <v-btn variant="text" v-bind="activatorProps">
-        <template #prepend>
-          <v-icon>mdi-link-plus</v-icon>
-        </template>
-        {{ $t("wallet.generateLink") }}
-      </v-btn>
-    </template>
-
-    <template #default="{ isActive }">
+  <v-dialog v-model="showDialog">
+    <template #default>
       <v-card>
         <v-card-title>{{ $t("wallet.generateLinkTitle") }}</v-card-title>
 
@@ -112,16 +136,23 @@ function generateLink(isActive: Ref<boolean>) {
           </v-form>
         </v-card-text>
 
+        <div v-if="shareLink" :class="$style.fieldWrapper">
+          <v-text-field
+            :value="shareLink"
+            density="compact"
+            variant="solo"
+            append-icon="mdi-content-copy"
+            readonly
+            @click:append="copyClick"
+          ></v-text-field>
+        </div>
+
         <v-card-actions>
-          <v-btn @click="isActive.value = false" color="error">
+          <v-btn @click="showDialog = false" color="error">
             {{ $t("ui.cancel") }}
           </v-btn>
 
-          <v-btn
-            @click="generateLink(isActive)"
-            color="primary"
-            variant="elevated"
-          >
+          <v-btn @click="generateLink()" color="primary" variant="elevated">
             {{ $t("wallet.generate") }}
           </v-btn>
         </v-card-actions>
@@ -129,3 +160,14 @@ function generateLink(isActive: Ref<boolean>) {
     </template>
   </v-dialog>
 </template>
+
+<style lang="scss" module>
+.fieldWrapper {
+  padding: 0 8px;
+  margin-top: 8px;
+
+  :global(.v-field) {
+    background-color: #52474b;
+  }
+}
+</style>

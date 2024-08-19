@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ShareLinkDialog from "@/components/ShareLinkDialog/ShareLinkDialog.vue";
 import { hasAccess } from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallets";
 import { AccessLevel } from "@/types/AccessLevel";
@@ -19,6 +20,7 @@ const { currentAccessLevel } = storeToRefs(walletStore);
 
 const isWalletEditDialogOpen = ref<boolean>(false);
 const isWalletDeleteDialogOpen = ref<boolean>(false);
+const isWalletShareDialogOpen = ref<boolean>(false);
 
 const items = computed(() => [
   {
@@ -40,12 +42,21 @@ const items = computed(() => [
     },
   },
   {
+    title: t("users.editUsers"),
+    icon: "mdi-account-multiple",
+    hasAccess: hasAccess([AccessLevel.View], currentAccessLevel.value),
+    color: "primary",
+    onSelect: () => {
+      router.push({ name: "Users" });
+    },
+  },
+  {
     title: t("wallet.share"),
     icon: "mdi-share-variant",
     hasAccess: hasAccess([AccessLevel.ShareWallet], currentAccessLevel.value),
     color: "primary",
     onSelect: () => {
-      router.push({ name: "ShareWallet" });
+      isWalletShareDialogOpen.value = true;
     },
   },
   {
@@ -95,6 +106,7 @@ const availableItems = computed(() =>
 
     <EditWalletDialog v-model:isOpen="isWalletEditDialogOpen" />
     <DeleteWalletDialog v-model:isOpen="isWalletDeleteDialogOpen" />
+    <ShareLinkDialog v-model:is-open="isWalletShareDialogOpen" />
   </div>
 </template>
 

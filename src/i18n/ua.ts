@@ -88,7 +88,7 @@ export default {
     removeUserMessage: "Ви впевнені, що хочете видалити користувача з гаманця?",
     removeWalletTitle: "Видалити гаманець",
     removeWalletMessage: "Ви впевнені, що хочете видалити гаманець?",
-    generateLinkTitle: "Налаштування посилання",
+    generateLinkTitle: "Поділитись посиланням",
     expireTime: "Час дії посилання",
     expireTimeUnit: "Одиниця виміру",
     activationCount: "Кількість активацій",
@@ -112,6 +112,10 @@ export default {
     parentCategory: "Батьківська категорія",
     noCategories: "Ще не додано жодної категорії",
     categoriesTitle: "Категорії",
+  },
+  users: {
+    users: "Користувачі",
+    editUsers: "Управління користувачами",
   },
   login: {
     title: "Авторизація",
