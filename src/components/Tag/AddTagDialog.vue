@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import TagCreation from "@/components/Tag/TagCreation.vue";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
   isOpen: Boolean,
 });
 
 const emit = defineEmits(["update:isOpen"]);
+
+const { t } = useI18n();
 
 const showDialog = computed({
   get: () => props.isOpen,
@@ -19,13 +22,13 @@ const showDialog = computed({
     <v-card
       max-width="400"
       prepend-icon="mdi-expand-all"
-      :title="$t('tag.addTag')"
+      :title="t('tag.addTag')"
     >
       <template #default>
         <TagCreation>
           <template #actions>
             <v-btn variant="text" @click="showDialog = false">
-              {{ $t("ui.close") }}
+              {{ t("ui.close") }}
             </v-btn>
           </template>
         </TagCreation>

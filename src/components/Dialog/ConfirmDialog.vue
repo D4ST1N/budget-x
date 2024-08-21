@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { Ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   title: string;
   message: string;
   confirm: () => void;
 }>();
+
+const { t } = useI18n();
 
 function onConfirmClick(isActive: Ref<boolean>) {
   props.confirm();
@@ -27,7 +30,7 @@ function onConfirmClick(isActive: Ref<boolean>) {
 
         <v-card-actions>
           <v-btn @click="isActive.value = false" color="error">
-            {{ $t("ui.cancel") }}
+            {{ t("ui.cancel") }}
           </v-btn>
 
           <v-btn
@@ -35,7 +38,7 @@ function onConfirmClick(isActive: Ref<boolean>) {
             color="primary"
             variant="elevated"
           >
-            {{ $t("ui.confirm") }}
+            {{ t("ui.confirm") }}
           </v-btn>
         </v-card-actions>
       </v-card>

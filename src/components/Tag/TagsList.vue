@@ -2,10 +2,13 @@
 import { useWalletStore } from "@/store/wallet";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import AddTagDialog from "./AddTagDialog.vue";
 import Tag from "./Tag.vue";
 
+const { t } = useI18n();
 const walletStore = useWalletStore();
+
 const { tags } = storeToRefs(walletStore);
 const isAddTagDialogOpen = ref<boolean>(false);
 
@@ -22,7 +25,7 @@ function openAddTagDialog() {
           <v-icon>mdi-expand-all</v-icon>
         </template>
 
-        {{ $t("tag.addTag") }}
+        {{ t("tag.addTag") }}
       </v-btn>
     </v-card-text>
 

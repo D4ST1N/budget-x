@@ -2,10 +2,13 @@
 import { useWalletStore } from "@/store/wallet";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import AddCategoryDialog from "./AddCategoryDialog.vue";
 import Category from "./Category.vue";
 
+const { t } = useI18n();
 const walletStore = useWalletStore();
+
 const { categoriesTree } = storeToRefs(walletStore);
 const isAddCategoryDialogOpen = ref<boolean>(false);
 
@@ -26,7 +29,7 @@ function openAddCategoryDialog() {
           <v-icon>mdi-expand-all</v-icon>
         </template>
 
-        {{ $t("category.addCategory") }}
+        {{ t("category.addCategory") }}
       </v-btn>
     </v-card-text>
 

@@ -4,6 +4,7 @@ import { useWalletStore } from "@/store/wallet";
 import { Category, CategoryData } from "@/types/Category";
 import { storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { VForm } from "vuetify/components";
 
 export interface CategoryCreationProps {
@@ -14,7 +15,9 @@ const props = defineProps<CategoryCreationProps>();
 
 const emit = defineEmits(["update:category"]);
 
+const { t } = useI18n();
 const walletStore = useWalletStore();
+
 const categoryName = ref<string>(props.category?.name || "");
 const valid = ref<boolean>(false);
 const isSubCategory = ref<boolean>(
@@ -74,14 +77,14 @@ async function createCategory() {
     <v-form ref="form" v-model="valid" @submit.prevent="createCategory">
       <v-text-field
         v-model="categoryName"
-        :label="$t('category.categoryName')"
+        :label="t('category.categoryName')"
         hide-details="auto"
         :rules="[requiredField]"
       ></v-text-field>
 
       <v-checkbox
         v-model="isSubCategory"
-        :label="$t('category.isSubCategory')"
+        :label="t('category.isSubCategory')"
         hide-details
       ></v-checkbox>
 
@@ -89,7 +92,7 @@ async function createCategory() {
         <v-select
           v-model="selectedCategory"
           :items="categoriesOptions"
-          :label="$t('category.parentCategory')"
+          :label="t('category.parentCategory')"
           no-data-text="category.noCategories"
           item-title="label"
           item-value="value"
@@ -107,7 +110,7 @@ async function createCategory() {
           variant="elevated"
           color="primary"
         >
-          {{ $t("ui.save") }}
+          {{ t("ui.save") }}
         </v-btn>
 
         <slot name="actions" />

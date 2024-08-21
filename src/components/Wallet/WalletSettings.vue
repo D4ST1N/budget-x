@@ -92,7 +92,7 @@ const availableItems = computed(() =>
           <template #prepend>
             <v-icon>mdi-cog</v-icon>
           </template>
-          {{ $t("wallet.edit") }}
+          {{ t("wallet.edit") }}
         </v-btn>
       </template>
 

@@ -2,6 +2,7 @@
 import CategoryCreation from "@/components/Category/CategoryCreation.vue";
 import { Category } from "@/types/Category";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 export interface EditCategoryDialogProps {
   isOpen: boolean;
@@ -11,6 +12,8 @@ export interface EditCategoryDialogProps {
 const props = defineProps<EditCategoryDialogProps>();
 
 const emit = defineEmits(["update:isOpen"]);
+
+const { t } = useI18n();
 
 const showDialog = computed({
   get: () => props.isOpen,
@@ -23,7 +26,7 @@ const showDialog = computed({
     <v-card
       max-width="400"
       prepend-icon="mdi-file-edit"
-      :title="$t('category.editCategory')"
+      :title="t('category.editCategory')"
     >
       <template #default>
         <CategoryCreation
@@ -32,7 +35,7 @@ const showDialog = computed({
         >
           <template #actions>
             <v-btn variant="text" @click="showDialog = false">
-              {{ $t("ui.close") }}
+              {{ t("ui.close") }}
             </v-btn>
           </template>
         </CategoryCreation>

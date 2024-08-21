@@ -15,9 +15,10 @@ import { useI18n } from "vue-i18n";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 
 const router = useRouter();
-const i18n = useI18n();
+const { t } = useI18n();
 const notificationStore = useNotificationStore();
 const userStore = useUserStore();
+
 const { user } = storeToRefs(userStore);
 const loading = ref<boolean>(false);
 const showHomeButton = ref<boolean>(false);
@@ -49,7 +50,7 @@ async function fetchInvitationInfo() {
       creatorAvatar.value = await fetchUserAvatar(response.data.creator);
     } else {
       notificationId = notificationStore.add({
-        text: i18n.t(`errors.${response.data.errorType}`),
+        text: t(`errors.${response.data.errorType}`),
         type: NotificationType.Error,
         timeout: -1,
       });
@@ -69,12 +70,12 @@ async function tryToJoin() {
 
     if (response.data.success) {
       notificationId = notificationStore.add({
-        text: i18n.t("notification.walletJoined"),
+        text: t("notification.walletJoined"),
         type: NotificationType.Success,
       });
     } else {
       notificationId = notificationStore.add({
-        text: i18n.t(`errors.${response.data.errorType}`),
+        text: t(`errors.${response.data.errorType}`),
         type: NotificationType.Error,
         timeout: -1,
       });
@@ -96,7 +97,7 @@ function goToHome() {
       <template #prepend>
         <v-icon>mdi-home</v-icon>
       </template>
-      {{ $t("ui.goHome") }}
+      {{ t("ui.goHome") }}
     </v-btn>
 
     <template v-else>
@@ -113,7 +114,7 @@ function goToHome() {
         </v-list-item>
 
         <v-list-subheader>
-          {{ $t("wallet.joiningWallet") }}
+          {{ t("wallet.joiningWallet") }}
         </v-list-subheader>
 
         <v-list-item>
@@ -129,7 +130,7 @@ function goToHome() {
           <v-icon>mdi-wallet-plus</v-icon>
         </template>
 
-        {{ $t("wallet.joinWallet") }}
+        {{ t("wallet.joinWallet") }}
       </v-btn>
     </template>
 

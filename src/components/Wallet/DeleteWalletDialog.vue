@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWalletStore } from "@/store/wallet";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
   isOpen: Boolean,
@@ -8,6 +9,7 @@ const props = defineProps({
 
 const emit = defineEmits(["update:isOpen"]);
 
+const { t } = useI18n();
 const walletStore = useWalletStore();
 
 const showDialog = computed({
@@ -26,16 +28,16 @@ function onDeleteClick() {
     <v-card
       max-width="400"
       prepend-icon="mdi-delete"
-      :title="$t('wallet.removeWalletTitle')"
-      :text="$t('wallet.removeWalletMessage')"
+      :title="t('wallet.removeWalletTitle')"
+      :text="t('wallet.removeWalletMessage')"
     >
       <template #actions>
         <v-btn variant="text" color="error" @click="onDeleteClick">
-          {{ $t("ui.delete") }}
+          {{ t("ui.delete") }}
         </v-btn>
 
         <v-btn variant="elevated" @click="showDialog = false">
-          {{ $t("ui.cancel") }}
+          {{ t("ui.cancel") }}
         </v-btn>
       </template>
     </v-card>

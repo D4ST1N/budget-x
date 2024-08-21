@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import WalletEditor from "@/components/Wallet/WalletEditor.vue";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
   isOpen: Boolean,
 });
 
 const emit = defineEmits(["update:isOpen"]);
+
+const { t } = useI18n();
 
 const showDialog = computed({
   get: () => props.isOpen,
@@ -19,13 +22,13 @@ const showDialog = computed({
     <v-card
       max-width="400"
       prepend-icon="mdi-rename"
-      :title="$t('wallet.changeName')"
+      :title="t('wallet.changeName')"
     >
       <template #default>
         <WalletEditor @on-save="showDialog = false">
           <template #actions>
             <v-btn variant="text" @click="showDialog = false">
-              {{ $t("ui.cancel") }}
+              {{ t("ui.cancel") }}
             </v-btn>
           </template>
         </WalletEditor>

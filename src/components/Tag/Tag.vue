@@ -6,6 +6,7 @@ import { AccessLevel } from "@/types/AccessLevel";
 import { Tag } from "@/types/Tag";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import ConfirmDialog from "../Dialog/ConfirmDialog.vue";
 
 export interface TagProps {
@@ -16,6 +17,9 @@ export interface TagProps {
 const props = withDefaults(defineProps<TagProps>(), {
   deleteAvailable: true,
 });
+
+const { t } = useI18n();
+
 const walletStore = useWalletStore();
 const { currentAccessLevel } = storeToRefs(walletStore);
 
@@ -49,9 +53,9 @@ function removeTag() {
 
       <ConfirmDialog
         v-if="deleteAllowed"
-        :title="$t('tag.deleteTag')"
+        :title="t('tag.deleteTag')"
         :message="
-          $t('tag.removeTagMessage', {
+          t('tag.removeTagMessage', {
             tag: props.tag.name,
           })
         "

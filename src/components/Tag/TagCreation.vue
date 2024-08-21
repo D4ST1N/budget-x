@@ -3,6 +3,7 @@ import { required } from "@/helpers/inputValidations";
 import { useWalletStore } from "@/store/wallet";
 import { Tag, TagData } from "@/types/Tag";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { VForm } from "vuetify/components";
 
 export interface TagCreationProps {
@@ -12,6 +13,8 @@ export interface TagCreationProps {
 const props = defineProps<TagCreationProps>();
 
 const emit = defineEmits(["update:tag"]);
+
+const { t } = useI18n();
 
 const walletStore = useWalletStore();
 const tagName = ref<string>(props.tag?.name || "");
@@ -50,7 +53,7 @@ async function createTag() {
     <v-form ref="form" v-model="valid" @submit.prevent="createTag">
       <v-text-field
         v-model="tagName"
-        :label="$t('tag.tagName')"
+        :label="t('tag.tagName')"
         hide-details="auto"
         :rules="[requiredField]"
       ></v-text-field>
@@ -64,7 +67,7 @@ async function createTag() {
           variant="elevated"
           color="primary"
         >
-          {{ $t("ui.save") }}
+          {{ t("ui.save") }}
         </v-btn>
 
         <slot name="actions" />

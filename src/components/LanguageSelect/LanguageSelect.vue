@@ -5,7 +5,7 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 const languageStore = useLanguageStore();
-const { t, availableLocales } = useI18n();
+const { t, availableLocales, locale } = useI18n();
 
 const languageOptions = computed(() => {
   return availableLocales.map((locale) => {
@@ -33,17 +33,13 @@ function updateLanguage(locale: string) {
 
 <template>
   <v-select
-    :model-value="$i18n.locale"
+    :model-value="locale"
     :items="languageOptions"
     hide-details
     @update:model-value="updateLanguage"
   >
     <template #prepend-inner>
-      <img
-        :src="getFlagUrl($i18n.locale)"
-        :alt="$i18n.locale"
-        :class="$style.flagMain"
-      />
+      <img :src="getFlagUrl(locale)" :alt="locale" :class="$style.flagMain" />
     </template>
     <template #item="{ props, item }">
       <v-list-item v-bind="props">

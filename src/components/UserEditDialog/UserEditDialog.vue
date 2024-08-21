@@ -5,11 +5,15 @@ import { AccessLevel } from "@/types/AccessLevel";
 import { UserData } from "@/types/User";
 import { storeToRefs } from "pinia";
 import { ref, Ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   user: UserData;
 }>();
+
+const { t } = useI18n();
 const walletStore = useWalletStore();
+
 const { currentAccessLevel } = storeToRefs(walletStore);
 const accessLevels = walletStore.getUserAccess(props.user.user_id);
 const selectedAccessLevels = ref<AccessLevel[]>([...accessLevels]);
@@ -36,15 +40,15 @@ async function confirm(isActive: Ref<boolean>) {
 
     <template #default="{ isActive }">
       <v-card>
-        <v-card-title>{{ $t("wallet.editAccess") }}</v-card-title>
+        <v-card-title>{{ t("wallet.editAccess") }}</v-card-title>
 
         <v-card-text>
           <v-form>
             <v-row>
               <v-col cols="12">
-                <v-list-subheader>{{
-                  $t("wallet.accessLevels")
-                }}</v-list-subheader>
+                <v-list-subheader>
+                  {{ t("wallet.accessLevels") }}
+                </v-list-subheader>
 
                 <v-divider />
 
@@ -59,11 +63,11 @@ async function confirm(isActive: Ref<boolean>) {
 
         <v-card-actions>
           <v-btn @click="isActive.value = false" color="error">
-            {{ $t("ui.cancel") }}
+            {{ t("ui.cancel") }}
           </v-btn>
 
           <v-btn @click="confirm(isActive)" color="primary" variant="elevated">
-            {{ $t("ui.save") }}
+            {{ t("ui.save") }}
           </v-btn>
         </v-card-actions>
       </v-card>

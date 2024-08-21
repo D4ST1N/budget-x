@@ -79,7 +79,7 @@ async function copyClick() {
   <v-dialog v-model="showDialog">
     <template #default>
       <v-card>
-        <v-card-title>{{ $t("wallet.generateLinkTitle") }}</v-card-title>
+        <v-card-title>{{ t("wallet.generateLinkTitle") }}</v-card-title>
 
         <v-card-text>
           <v-form>
@@ -87,7 +87,7 @@ async function copyClick() {
               <v-col cols="6">
                 <v-text-field
                   v-model="expireTime"
-                  :label="$t('wallet.expireTime')"
+                  :label="t('wallet.expireTime')"
                   type="number"
                   min="1"
                   max="999"
@@ -100,7 +100,7 @@ async function copyClick() {
                 <v-select
                   v-model="expireTimeUnit"
                   :items="unitLabels"
-                  :label="$t('wallet.expireTimeUnit')"
+                  :label="t('wallet.expireTimeUnit')"
                   item-title="label"
                   item-value="value"
                   hide-details
@@ -111,7 +111,7 @@ async function copyClick() {
               <v-col cols="6">
                 <v-text-field
                   v-model="activationCount"
-                  :label="$t('wallet.activationCount')"
+                  :label="t('wallet.activationCount')"
                   type="number"
                   min="1"
                   max="10"
@@ -122,7 +122,7 @@ async function copyClick() {
 
               <v-col cols="12">
                 <v-list-subheader>
-                  {{ $t("wallet.accessLevels") }}
+                  {{ t("wallet.accessLevels") }}
                 </v-list-subheader>
 
                 <v-divider />
@@ -149,11 +149,11 @@ async function copyClick() {
 
         <v-card-actions>
           <v-btn @click="showDialog = false" color="error">
-            {{ $t("ui.cancel") }}
+            {{ t("ui.cancel") }}
           </v-btn>
 
           <v-btn @click="generateLink()" color="primary" variant="elevated">
-            {{ $t("wallet.generate") }}
+            {{ t("wallet.generate") }}
           </v-btn>
         </v-card-actions>
       </v-card>
