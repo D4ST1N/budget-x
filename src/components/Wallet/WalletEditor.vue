@@ -6,10 +6,13 @@ import { AccessLevel } from "@/types/AccessLevel";
 import { Wallet } from "@/types/Wallet";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const emit = defineEmits(["on-save"]);
 
+const { t } = useI18n();
 const walletStore = useWalletStore();
+
 const { currentWallet, currentAccessLevel } = storeToRefs(walletStore);
 const newWallet = ref({ ...currentWallet.value });
 
@@ -39,7 +42,7 @@ function updateWallet() {
     >
       <v-text-field
         v-model="newWallet.name"
-        :label="$t('wallet.walletName')"
+        :label="t('wallet.walletName')"
         hide-details="auto"
         :readonly="!editAvailable"
         :rules="[requiredField]"
@@ -55,7 +58,7 @@ function updateWallet() {
           variant="elevated"
           color="primary"
         >
-          {{ $t("ui.save") }}
+          {{ t("ui.save") }}
         </v-btn>
         <slot name="actions" />
       </div>

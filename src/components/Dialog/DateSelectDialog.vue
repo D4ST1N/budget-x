@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
   isOpen: Boolean,
@@ -7,6 +8,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:isOpen", "update:date"]);
+
+const { t } = useI18n();
 
 const showDialog = computed({
   get: () => props.isOpen,
@@ -24,7 +27,7 @@ const pickerValue = computed({
     <v-card
       max-width="400"
       prepend-icon="mdi-calendar-range"
-      :title="$t('ui.selectDate')"
+      :title="t('ui.selectDate')"
     >
       <template #default>
         <v-date-picker
@@ -41,7 +44,7 @@ const pickerValue = computed({
 
       <template #actions>
         <v-btn variant="text" @click="showDialog = false">
-          {{ $t("ui.close") }}
+          {{ t("ui.close") }}
         </v-btn>
       </template>
     </v-card>

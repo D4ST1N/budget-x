@@ -8,6 +8,9 @@ import { AccessLevel } from "@/types/AccessLevel";
 import { UserData } from "@/types/User";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const userStore = useUserStore();
 const walletStore = useWalletStore();
@@ -44,7 +47,7 @@ async function removeUser(userId: string) {
 <template>
   <v-list class="mb-3">
     <v-list-subheader>
-      {{ $t("wallet.sharedForUsersTitle") }}
+      {{ t("wallet.sharedForUsersTitle") }}
     </v-list-subheader>
 
     <template v-if="fetchingWalletUsers">
@@ -71,8 +74,8 @@ async function removeUser(userId: string) {
           <UserEditDialog v-if="editUserAvailable" :user="user" />
           <ConfirmDialog
             v-if="deleteUserAvailable"
-            :title="$t('wallet.removeUserTitle')"
-            :message="$t('wallet.removeUserMessage')"
+            :title="t('wallet.removeUserTitle')"
+            :message="t('wallet.removeUserMessage')"
             :confirm="() => removeUser(user.user_id)"
           >
             <template #activator="{ props: activatorProps }">
@@ -96,6 +99,6 @@ async function removeUser(userId: string) {
     variant="tonal"
     density="compact"
   >
-    {{ $t("wallet.noUserAdded") }}
+    {{ t("wallet.noUserAdded") }}
   </v-alert>
 </template>

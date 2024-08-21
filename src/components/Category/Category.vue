@@ -6,6 +6,7 @@ import { AccessLevel } from "@/types/AccessLevel";
 import { Category } from "@/types/Category";
 import { storeToRefs } from "pinia";
 import { computed, ref, useCssModule } from "vue";
+import { useI18n } from "vue-i18n";
 import ConfirmDialog from "../Dialog/ConfirmDialog.vue";
 
 export interface CategoryProps {
@@ -18,8 +19,11 @@ const props = withDefaults(defineProps<CategoryProps>(), {
   subCategory: false,
   deleteAvailable: true,
 });
+
+const { t } = useI18n();
 const styles = useCssModule();
 const walletStore = useWalletStore();
+
 const { currentAccessLevel } = storeToRefs(walletStore);
 
 const isEditDialogOpen = ref<boolean>(false);
@@ -62,9 +66,9 @@ function removeCategory() {
 
       <ConfirmDialog
         v-if="deleteAllowed"
-        :title="$t('category.deleteCategory')"
+        :title="t('category.deleteCategory')"
         :message="
-          $t('category.removeCategoryMessage', {
+          t('category.removeCategoryMessage', {
             category: props.category.name,
           })
         "
