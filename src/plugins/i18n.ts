@@ -1,5 +1,23 @@
-import { createI18n } from "vue-i18n";
 import { en, ua } from "@/i18n";
+import { createI18n } from "vue-i18n";
+
+const numberFormats: Record<
+  string,
+  Record<string, Intl.NumberFormatOptions>
+> = {
+  en: {
+    currency: {
+      style: "currency",
+      currency: "UAH",
+    },
+  },
+  ua: {
+    currency: {
+      style: "currency",
+      currency: "UAH",
+    },
+  },
+};
 
 const messages = {
   en,
@@ -9,7 +27,8 @@ const messages = {
 const i18n = createI18n({
   legacy: false,
   locale: "ua",
-  fallbackLocale: "en",
+  fallbackLocale: "ua",
+  numberFormats,
   messages,
 });
 

@@ -46,8 +46,23 @@ export const getWalletTagsUrl = (walletId: string) => `/wallet/${walletId}/tag`;
 
 export const addWalletTagUrl = (walletId: string) => `/wallet/${walletId}/tag`;
 
+export const addWalletTagsBulkUrl = (walletId: string) =>
+  `/wallet/${walletId}/tag/bulk`;
+
 export const updateWalletTagUrl = (walletId: string, tagId: string) =>
   `/wallet/${walletId}/tag/${tagId}`;
 
 export const deleteWalletTagUrl = (walletId: string, tagId: string) =>
   `/wallet/${walletId}/tag/${tagId}`;
+
+export const getWalletExpensesUrl = (walletId: string) =>
+  `/wallet/${walletId}/expense`;
+
+export const addWalletExpenseUrl = (walletId: string) =>
+  `/wallet/${walletId}/expense`;
+
+export const updateWalletExpenseUrl = (walletId: string, expenseId: string) =>
+  `/wallet/${walletId}/expense/${expenseId}`;
+
+export const deleteWalletExpenseUrl = (walletId: string, expenseId: string) =>
+  `/wallet/${walletId}/expense/${expenseId}`;

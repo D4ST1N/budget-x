@@ -21,9 +21,13 @@ const { currentAccessLevel } = storeToRefs(walletStore);
 
 const isEditDialogOpen = ref<boolean>(false);
 
+const editAllowed = computed(() =>
+  hasAccess([AccessLevel.UpdateTag], currentAccessLevel.value)
+);
+
 const deleteAllowed = computed(
   () =>
-    hasAccess([AccessLevel.ManageTags], currentAccessLevel.value) &&
+    hasAccess([AccessLevel.DeleteTag], currentAccessLevel.value) &&
     props.deleteAvailable
 );
 
@@ -36,6 +40,7 @@ function removeTag() {
   <v-list-item :title="props.tag.name" :class="$style.tag" rounded>
     <template #append>
       <v-btn
+        v-if="editAllowed"
         icon="mdi-pencil"
         variant="text"
         size="small"

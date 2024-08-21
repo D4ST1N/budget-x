@@ -18,11 +18,11 @@ const { sharedUsers, fetchingWalletUsers, currentAccessLevel } =
 walletStore.fetchWalletUsers();
 
 const editUserAvailable = computed(() =>
-  hasAccess([AccessLevel.Edit], currentAccessLevel.value)
+  hasAccess([AccessLevel.UpdateUser], currentAccessLevel.value)
 );
 
 const deleteUserAvailable = computed(() =>
-  hasAccess([AccessLevel.Delete], currentAccessLevel.value)
+  hasAccess([AccessLevel.DeleteUser], currentAccessLevel.value)
 );
 
 function isCurrentUser(user: UserData) {

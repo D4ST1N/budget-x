@@ -29,9 +29,13 @@ const categoryStyles = computed(() => ({
   [styles.subCategory]: props.subCategory,
 }));
 
+const editAllowed = computed(() =>
+  hasAccess([AccessLevel.UpdateCategory], currentAccessLevel.value)
+);
+
 const deleteAllowed = computed(
   () =>
-    hasAccess([AccessLevel.DeleteCategories], currentAccessLevel.value) &&
+    hasAccess([AccessLevel.DeleteCategory], currentAccessLevel.value) &&
     props.deleteAvailable
 );
 
@@ -49,6 +53,7 @@ function removeCategory() {
   >
     <template #append>
       <v-btn
+        v-if="editAllowed"
         icon="mdi-pencil"
         variant="text"
         size="small"

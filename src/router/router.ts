@@ -62,8 +62,7 @@ const routes = [
         component: WalletEditor,
         meta: {
           titleKey: "wallet.editWallet",
-          accessLevel: [AccessLevel.Edit, AccessLevel.Delete],
-          accessOperator: "OR",
+          accessLevel: [AccessLevel.Update],
         },
       },
       {
@@ -99,7 +98,16 @@ const routes = [
         component: () => import("@/components/Tag/TagsList.vue"),
         meta: {
           titleKey: "tag.tags",
-          accessLevel: [AccessLevel.ManageTags],
+          accessLevel: [AccessLevel.View],
+        },
+      },
+      {
+        path: "expense",
+        name: "AddExpense",
+        component: () => import("@/components/Expense/AddExpense.vue"),
+        meta: {
+          titleKey: "expense.newExpense",
+          accessLevel: [AccessLevel.CreateExpense],
         },
       },
     ],

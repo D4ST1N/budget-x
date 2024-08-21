@@ -74,6 +74,6 @@ onMounted(() => {
 }
 
 .logo {
-  height: 36px;
+  height: 32px;
 }
 </style>

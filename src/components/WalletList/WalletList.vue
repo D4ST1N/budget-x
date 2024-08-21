@@ -2,6 +2,9 @@
 import { useWalletStore } from "@/store/wallet";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const walletsStore = useWalletStore();
 const { wallets, sharedWallets, currentWallet } = storeToRefs(walletsStore);
@@ -36,7 +39,7 @@ function selectWallet(walletId: string) {
 <template>
   <v-menu v-if="allWallets.length > 0">
     <template #activator="{ props }">
-      <v-btn color="primary" variant="text" v-bind="props">
+      <v-btn color="primary" variant="text" size="small" v-bind="props">
         <span :class="$style.truncate">{{ currentWallet?.name }}</span>
 
         <template #append>
@@ -48,7 +51,7 @@ function selectWallet(walletId: string) {
     <v-list>
       <template v-if="myWallets.length">
         <v-list-subheader color="primary">
-          {{ $t("wallet.myWallets") }}
+          {{ t("wallet.myWallets") }}
         </v-list-subheader>
 
         <v-list-item
@@ -67,7 +70,7 @@ function selectWallet(walletId: string) {
 
       <template v-if="otherWallets.length">
         <v-list-subheader color="primary">
-          {{ $t("wallet.sharedWallets") }}
+          {{ t("wallet.sharedWallets") }}
         </v-list-subheader>
 
         <v-list-item
@@ -86,7 +89,7 @@ function selectWallet(walletId: string) {
             <v-icon>mdi-plus</v-icon>
           </template>
 
-          {{ $t("wallet.add") }}
+          {{ t("wallet.add") }}
         </v-btn>
       </div>
     </v-list>
@@ -95,7 +98,7 @@ function selectWallet(walletId: string) {
     <template #prepend>
       <v-icon>mdi-plus</v-icon>
     </template>
-    {{ $t("wallet.add") }}
+    {{ t("wallet.add") }}
   </v-btn>
 </template>
 
@@ -104,6 +107,6 @@ function selectWallet(walletId: string) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 200px;
+  max-width: 180px;
 }
 </style>

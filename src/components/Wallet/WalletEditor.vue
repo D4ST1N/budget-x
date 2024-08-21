@@ -17,7 +17,7 @@ const requiredField = required();
 const valid = ref<boolean>(false);
 
 const editAvailable = computed(() =>
-  hasAccess([AccessLevel.Edit], currentAccessLevel.value)
+  hasAccess([AccessLevel.Update], currentAccessLevel.value)
 );
 
 const isChanged = computed(

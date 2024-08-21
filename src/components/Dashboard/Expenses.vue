@@ -1,64 +1,120 @@
 <script setup lang="ts">
+import { generateColorFromHash } from "@/helpers/utils";
+import { useWalletStore } from "@/store/wallet";
+import { ExpensesData } from "@/types/Expense";
+import { computed, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import DashboardPanel from "./DashboardPanel.vue";
 
-const options = {
-  chart: {
-    type: "pie",
-    backgroundColor: "transparent", // Прозорий фон
-    width: 360, // Збільшена ширина
-    height: 360, // Збільшена висота
-  },
-  title: {
-    text: "Витрати цього місяця",
-    style: {
-      color: "#FFFFFF", // Білий текст заголовка
+interface ChartData {
+  name: string;
+  y: number;
+  color: string;
+}
+
+const { t, n } = useI18n();
+
+const walletStore = useWalletStore();
+const chartData = ref<ChartData[]>([]);
+const chartContainer = ref<InstanceType<typeof DashboardPanel> | null>(null);
+const containerWidth = ref<number>(360);
+
+const totalAmount = computed(() =>
+  chartData.value.reduce((acc, data) => acc + data.y, 0)
+);
+
+const chartOptions = computed(() => {
+  return {
+    chart: {
+      type: "pie",
+      backgroundColor: "transparent",
+      width: containerWidth.value,
+      height: containerWidth.value - 40,
     },
-  },
-  plotOptions: {
-    pie: {
-      innerSize: "50%",
-      borderColor: "transparent",
-      dataLabels: {
-        enabled: true,
-        style: {
-          color: "#FFFFFF", // Білий текст на діаграмі
+    title: {
+      text: t("wallet.monthExpenses"),
+      style: {
+        color: "#FFFFFF",
+      },
+    },
+    subtitle: {
+      useHTML: true,
+      text: `<div style="display: flex; align-items: center; flex-direction: column; color: #FFFFFF"><span style="font-size: 12px">${t("wallet.total")}</span><div style="font-size: 14px"><b>${n(totalAmount.value, "currency")}</b></div></div>`,
+      floating: true,
+      verticalAlign: "middle",
+      y: 25,
+    },
+    plotOptions: {
+      pie: {
+        innerSize: "60%",
+        borderColor: "transparent",
+        dataLabels: {
+          enabled: true,
+          style: {
+            color: "#FFFFFF",
+          },
         },
       },
     },
-  },
-  series: [
-    {
-      name: "Витрати",
-      data: [
-        { name: "Оренда", y: 500, color: "#3498db" }, // Блакитний
-        { name: "Продукти", y: 300, color: "#e74c3c" }, // Червоний
-        { name: "Кафе та ресторани", y: 100, color: "#2ecc71" }, // Зелений
-        { name: "Автомобіль", y: 150, color: "#9b59b6" }, // Фіолетовий
-        { name: "Дитина", y: 200, color: "#f1c40f" }, // Жовтий
-        { name: "Одяг", y: 120, color: "#e67e22" }, // Оранжевий
-        { name: "Розваги", y: 80, color: "#1abc9c" }, // Бірюзовий
-        { name: "Інше", y: 50, color: "#95a5a6" }, // Сірий
-      ],
+    series: [
+      {
+        name: t("expense.expenses"),
+        data: chartData.value,
+      },
+    ],
+    tooltip: {
+      backgroundColor: "rgba(0, 0, 0, 0.7)",
+      style: {
+        color: "#FFFFFF",
+      },
     },
-  ],
-  tooltip: {
-    backgroundColor: "rgba(0, 0, 0, 0.7)", // Темний фон підказки
-    style: {
-      color: "#FFFFFF", // Білий текст підказки
-    },
-  },
-};
+  };
+});
+
+onMounted(() => {
+  if (chartContainer.value) {
+    containerWidth.value = chartContainer.value.$el.clientWidth;
+    getData();
+  }
+});
+
+async function getData() {
+  const { expenses, categories }: ExpensesData =
+    await walletStore.fetchWalletExpenses();
+
+  const categoryTotals: Record<string, number> = {};
+
+  expenses.forEach((expense) => {
+    if (categoryTotals[expense.categoryId]) {
+      categoryTotals[expense.categoryId] += expense.amount;
+    } else {
+      categoryTotals[expense.categoryId] = expense.amount;
+    }
+  });
+
+  chartData.value = Object.entries(categoryTotals).map(
+    ([categoryId, totalAmount]) => {
+      const category = categories.find((c) => c._id === categoryId)!;
+
+      return {
+        name: category.name,
+        y: totalAmount,
+        color: generateColorFromHash(category._id),
+      };
+    }
+  );
+}
 </script>
 
 <template>
-  <DashboardPanel :class="$style.container">
+  <DashboardPanel ref="chartContainer" :class="$style.container">
     <slot />
-    <highcharts :options="options" :class="$style.chart"></highcharts>
+    <highcharts :options="chartOptions" :class="$style.chart"></highcharts>
     <v-btn variant="text" :to="{ name: 'Statistic' }">
       <template #prepend>
         <v-icon>mdi-chart-bar-stacked</v-icon>
       </template>
-      {{ $t("wallet.detail") }}
+      {{ t("wallet.detail") }}
     </v-btn>
   </DashboardPanel>
 </template>

@@ -26,7 +26,7 @@ const items = computed(() => [
   {
     title: t("wallet.changeName"),
     icon: "mdi-rename",
-    hasAccess: hasAccess([AccessLevel.Edit], currentAccessLevel.value),
+    hasAccess: hasAccess([AccessLevel.Update], currentAccessLevel.value),
     color: "primary",
     onSelect: () => {
       isWalletEditDialogOpen.value = true;
@@ -35,7 +35,7 @@ const items = computed(() => [
   {
     title: t("category.editCategories"),
     icon: "mdi-file-edit",
-    hasAccess: hasAccess([AccessLevel.AddCategories], currentAccessLevel.value),
+    hasAccess: hasAccess([AccessLevel.View], currentAccessLevel.value),
     color: "primary",
     onSelect: () => {
       router.push({ name: "Categories" });
@@ -44,7 +44,7 @@ const items = computed(() => [
   {
     title: t("tag.editTags"),
     icon: "mdi-tag-multiple",
-    hasAccess: hasAccess([AccessLevel.ManageTags], currentAccessLevel.value),
+    hasAccess: hasAccess([AccessLevel.View], currentAccessLevel.value),
     color: "primary",
     onSelect: () => {
       router.push({ name: "Tags" });
@@ -62,7 +62,7 @@ const items = computed(() => [
   {
     title: t("wallet.share"),
     icon: "mdi-share-variant",
-    hasAccess: hasAccess([AccessLevel.ShareWallet], currentAccessLevel.value),
+    hasAccess: hasAccess([AccessLevel.AddUser], currentAccessLevel.value),
     color: "primary",
     onSelect: () => {
       isWalletShareDialogOpen.value = true;

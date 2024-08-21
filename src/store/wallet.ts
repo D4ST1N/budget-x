@@ -1,8 +1,11 @@
 import {
   addWalletCategoryUrl,
+  addWalletExpenseUrl,
+  addWalletTagsBulkUrl,
   addWalletTagUrl,
   addWalletUrl,
   deleteWalletCategoryUrl,
+  deleteWalletExpenseUrl,
   deleteWalletTagUrl,
   deleteWalletUrl,
   deleteWalletUserUrl,
@@ -12,6 +15,7 @@ import {
   getWalletTagsUrl,
   getWalletUsersUrl,
   updateWalletCategoryUrl,
+  updateWalletExpenseUrl,
   updateWalletTagUrl,
   updateWalletUrl,
   updateWalletUserUrl,
@@ -28,6 +32,11 @@ import {
   CategoryTreeElement,
   SuccessWalletCategoriesFetchResponse,
 } from "@/types/Category";
+import {
+  ExpenseData,
+  ExpensesData,
+  SuccessWalletExpensesFetchResponse,
+} from "@/types/Expense";
 import { InvitationOptions } from "@/types/Invitation";
 import { NotificationType } from "@/types/Notification";
 import { ServerResponse, ServerResponseError } from "@/types/ServerResponse";
@@ -357,6 +366,32 @@ export const useWalletStore = defineStore(
       return false;
     }
 
+    async function createTags(tagsData: TagData[]) {
+      if (!selectedWallet.value) return false;
+
+      const response: AxiosResponse<ServerResponse> = await api.post(
+        addWalletTagsBulkUrl(selectedWallet.value),
+        JSON.stringify({ tags: tagsData })
+      );
+
+      if (response.data.success) {
+        fetchWalletTags();
+        notificationStore.add({
+          text: i18n.global.t("notification.tagsAdded"),
+          type: NotificationType.Success,
+        });
+
+        return true;
+      }
+
+      notificationStore.add({
+        text: i18n.global.t(`errors.${response.data.errorType}`),
+        type: NotificationType.Error,
+      });
+
+      return false;
+    }
+
     async function updateTag(updatedTag: TagData, tagId: string) {
       if (!selectedWallet.value) return false;
 
@@ -555,6 +590,115 @@ export const useWalletStore = defineStore(
       return [];
     }
 
+    async function createExpense(expenseData: ExpenseData) {
+      if (!selectedWallet.value) return;
+
+      console.log(expenseData);
+
+      const response: AxiosResponse<ServerResponse> = await api.post(
+        addWalletExpenseUrl(selectedWallet.value),
+        JSON.stringify(expenseData)
+      );
+
+      if (response.data.success) {
+        notificationStore.add({
+          text: i18n.global.t("notification.expenseAdded"),
+          type: NotificationType.Success,
+        });
+      } else {
+        notificationStore.add({
+          text: i18n.global.t(`errors.${response.data.errorType}`),
+          type: NotificationType.Error,
+        });
+      }
+    }
+
+    async function fetchWalletExpenses(): Promise<ExpensesData> {
+      if (!selectedWallet.value)
+        return {
+          expenses: [],
+          categories: [],
+          tags: [],
+        };
+
+      const date = new Date();
+      const currentMonth = date.getMonth();
+      const currentYear = date.getFullYear();
+      const params = {
+        month: currentMonth,
+        year: currentYear,
+        categories: [],
+        tags: [],
+      };
+
+      const response: AxiosResponse<
+        SuccessWalletExpensesFetchResponse | ServerResponseError
+      > = await api.get(addWalletExpenseUrl(selectedWallet.value), { params });
+
+      if (response.data.success) {
+        return response.data;
+      }
+
+      notificationStore.add({
+        text: i18n.global.t(`errors.${response.data.errorType}`),
+        type: NotificationType.Error,
+      });
+
+      return {
+        expenses: [],
+        categories: [],
+        tags: [],
+      };
+    }
+
+    async function updateWalletExpense(
+      expenseData: ExpenseData,
+      expenseId: string
+    ) {
+      if (!selectedWallet.value) return;
+
+      const response: AxiosResponse<ServerResponse> = await api.patch(
+        updateWalletExpenseUrl(selectedWallet.value, expenseId),
+        JSON.stringify(expenseData)
+      );
+
+      if (response.data.success) {
+        notificationStore.add({
+          text: i18n.global.t("notification.expenseUpdated"),
+          type: NotificationType.Success,
+        });
+      } else {
+        notificationStore.add({
+          text: i18n.global.t(`errors.${response.data.errorType}`),
+          type: NotificationType.Error,
+        });
+      }
+    }
+
+    async function deleteWalletExpense(expenseId: string) {
+      if (!selectedWallet.value) return;
+
+      const response: AxiosResponse<ServerResponse> = await api.delete(
+        deleteWalletExpenseUrl(selectedWallet.value, expenseId)
+      );
+
+      if (response.data.success) {
+        notificationStore.add({
+          text: i18n.global.t("notification.expenseDeleted"),
+          type: NotificationType.Success,
+        });
+      } else {
+        notificationStore.add({
+          text: i18n.global.t(`errors.${response.data.errorType}`),
+          type: NotificationType.Error,
+        });
+      }
+    }
+
+    function getCategoryById(categoryId: string): Category | undefined {
+      return categories.value.find((category) => category._id === categoryId);
+    }
+
     return {
       wallets,
       sharedWallets,
@@ -577,6 +721,7 @@ export const useWalletStore = defineStore(
       updateCategory,
       deleteCategory,
       createTag,
+      createTags,
       updateTag,
       deleteTag,
       updateWalletName,
@@ -586,6 +731,11 @@ export const useWalletStore = defineStore(
       editWalletUser,
       deleteWalletUser,
       getUserAccess,
+      createExpense,
+      fetchWalletExpenses,
+      updateWalletExpense,
+      deleteWalletExpense,
+      getCategoryById,
     };
   },
   {

@@ -42,3 +42,23 @@ export function hasAccess(
 
   return requiredAccess.some((access) => userAccess.includes(access));
 }
+
+export function hashStringToNumber(str: string): number {
+  let hash = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash;
+  }
+
+  return Math.abs(hash);
+}
+
+export function generateColorFromHash(str: string): string {
+  const hash = hashStringToNumber(str);
+  const r = (hash & 0xff0000) >> 16;
+  const g = (hash & 0x00ff00) >> 8;
+  const b = hash & 0x0000ff;
+
+  return `rgb(${r}, ${g}, ${b})`;
+}
