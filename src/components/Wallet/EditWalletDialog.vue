@@ -2,13 +2,13 @@
 import WalletEditor from "@/components/Wallet/WalletEditor.vue";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import BaseDialog from "../Base/BaseDialog.vue";
+import CloseButton from "../Base/CloseButton.vue";
 
 const props = defineProps({
   isOpen: Boolean,
 });
-
 const emit = defineEmits(["update:isOpen"]);
-
 const { t } = useI18n();
 
 const showDialog = computed({
@@ -18,21 +18,15 @@ const showDialog = computed({
 </script>
 
 <template>
-  <v-dialog v-model="showDialog" width="400">
-    <v-card
-      max-width="400"
-      prepend-icon="mdi-rename"
-      :title="t('wallet.changeName')"
-    >
-      <template #default>
-        <WalletEditor @on-save="showDialog = false">
-          <template #actions>
-            <v-btn variant="text" @click="showDialog = false">
-              {{ t("ui.cancel") }}
-            </v-btn>
-          </template>
-        </WalletEditor>
+  <BaseDialog
+    v-model:isOpen="showDialog"
+    :title="t('wallet.changeName')"
+    title-icon="mdi-rename"
+  >
+    <WalletEditor @on-save="showDialog = false">
+      <template #actions>
+        <CloseButton @click="showDialog = false" />
       </template>
-    </v-card>
-  </v-dialog>
+    </WalletEditor>
+  </BaseDialog>
 </template>

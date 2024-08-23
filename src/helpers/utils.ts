@@ -62,3 +62,21 @@ export function generateColorFromHash(str: string): string {
 
   return `rgb(${r}, ${g}, ${b})`;
 }
+
+export function formatDate(
+  input: Date | string,
+  format: string = "YYYY-MM-DD"
+): string {
+  const date = typeof input === "string" ? new Date(input) : input;
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  const formattedDate = format
+    .replace("YYYY", year.toString())
+    .replace("MM", month)
+    .replace("DD", day);
+
+  return formattedDate;
+}

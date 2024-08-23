@@ -8,6 +8,8 @@ import { NotificationType } from "@/types/Notification";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import BaseDialog from "../Base/BaseDialog.vue";
+import CloseButton from "../Base/CloseButton.vue";
 
 enum TimeUnit {
   Hour = "Hour",
@@ -17,13 +19,11 @@ enum TimeUnit {
 const props = defineProps({
   isOpen: Boolean,
 });
-
 const emit = defineEmits(["update:isOpen"]);
-
 const { t } = useI18n();
-
 const notificationStore = useNotificationStore();
 const walletStore = useWalletStore();
+
 const { currentAccessLevel } = storeToRefs(walletStore);
 const expireTime = ref<number>(1);
 const expireTimeUnit = ref<TimeUnit>(TimeUnit.Hour);
@@ -50,7 +50,7 @@ async function generateLink() {
     maxUses: activationCount.value,
   };
 
-  const token = await walletStore.shareWallet(payload);
+  const token = await walletStore.createInvitationLink(payload);
 
   if (token) {
     const baseAppUrl = new URL(import.meta.env.BASE_URL, import.meta.url).href;
@@ -76,89 +76,86 @@ async function copyClick() {
 </script>
 
 <template>
-  <v-dialog v-model="showDialog">
+  <BaseDialog
+    v-model:isOpen="showDialog"
+    :title="t('wallet.generateLinkTitle')"
+    title-icon="mdi-share-variant"
+  >
     <template #default>
-      <v-card>
-        <v-card-title>{{ t("wallet.generateLinkTitle") }}</v-card-title>
+      <v-card-text>
+        <v-form>
+          <v-row>
+            <v-col cols="6">
+              <v-text-field
+                v-model="expireTime"
+                :label="t('wallet.expireTime')"
+                type="number"
+                min="1"
+                max="999"
+                hide-details
+                density="comfortable"
+              />
+            </v-col>
 
-        <v-card-text>
-          <v-form>
-            <v-row>
-              <v-col cols="6">
-                <v-text-field
-                  v-model="expireTime"
-                  :label="t('wallet.expireTime')"
-                  type="number"
-                  min="1"
-                  max="999"
-                  hide-details
-                  density="comfortable"
-                />
-              </v-col>
+            <v-col cols="6">
+              <v-select
+                v-model="expireTimeUnit"
+                :items="unitLabels"
+                :label="t('wallet.expireTimeUnit')"
+                item-title="label"
+                item-value="value"
+                hide-details
+                density="comfortable"
+              />
+            </v-col>
 
-              <v-col cols="6">
-                <v-select
-                  v-model="expireTimeUnit"
-                  :items="unitLabels"
-                  :label="t('wallet.expireTimeUnit')"
-                  item-title="label"
-                  item-value="value"
-                  hide-details
-                  density="comfortable"
-                />
-              </v-col>
+            <v-col cols="6">
+              <v-text-field
+                v-model="activationCount"
+                :label="t('wallet.activationCount')"
+                type="number"
+                min="1"
+                max="10"
+                hide-details
+                density="comfortable"
+              />
+            </v-col>
 
-              <v-col cols="6">
-                <v-text-field
-                  v-model="activationCount"
-                  :label="t('wallet.activationCount')"
-                  type="number"
-                  min="1"
-                  max="10"
-                  hide-details
-                  density="comfortable"
-                />
-              </v-col>
+            <v-col cols="12">
+              <v-list-subheader>
+                {{ t("wallet.accessLevels") }}
+              </v-list-subheader>
 
-              <v-col cols="12">
-                <v-list-subheader>
-                  {{ t("wallet.accessLevels") }}
-                </v-list-subheader>
+              <v-divider />
 
-                <v-divider />
+              <AccessEditor
+                v-model="selectedAccessLevels"
+                :accessLevels="currentAccessLevel"
+              />
+            </v-col>
+          </v-row>
+        </v-form>
+      </v-card-text>
 
-                <AccessEditor
-                  v-model="selectedAccessLevels"
-                  :accessLevels="currentAccessLevel"
-                />
-              </v-col>
-            </v-row>
-          </v-form>
-        </v-card-text>
-
-        <div v-if="shareLink" :class="$style.fieldWrapper">
-          <v-text-field
-            :value="shareLink"
-            density="compact"
-            variant="solo"
-            append-icon="mdi-content-copy"
-            readonly
-            @click:append="copyClick"
-          ></v-text-field>
-        </div>
-
-        <v-card-actions>
-          <v-btn @click="showDialog = false" color="error">
-            {{ t("ui.cancel") }}
-          </v-btn>
-
-          <v-btn @click="generateLink()" color="primary" variant="elevated">
-            {{ t("wallet.generate") }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+      <div v-if="shareLink" :class="$style.fieldWrapper">
+        <v-text-field
+          :value="shareLink"
+          density="compact"
+          variant="solo"
+          append-icon="mdi-content-copy"
+          readonly
+          @click:append="copyClick"
+        ></v-text-field>
+      </div>
     </template>
-  </v-dialog>
+    <template #actions>
+      <v-btn @click="generateLink()" color="primary" variant="elevated">
+        {{ t("wallet.generate") }}
+      </v-btn>
+
+      <CloseButton @click="showDialog = false" />
+    </template>
+  </BaseDialog>
 </template>
 
 <style lang="scss" module>

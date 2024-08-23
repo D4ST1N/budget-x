@@ -150,6 +150,11 @@ export default {
     expenses: "Витрати",
     newExpense: "Нова витрата",
     amount: "Сума",
+    viewExpenses: "Переглянути витрати",
+    expensesTitle: "Список витрат",
+    deleteExpense: "Видалити витрату",
+    deleteExpenseText: "Ви впевнені, що хочете видалити витрату?",
+    editExpense: "Редагувати витрату",
   },
   users: {
     users: "Користувачі",

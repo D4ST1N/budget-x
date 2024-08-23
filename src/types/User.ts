@@ -1,7 +1,6 @@
 import { User } from "@stytch/vanilla-js";
-import { SuccessServerResponse } from "./ServerResponse";
 
-export interface UserVerificationResponse extends SuccessServerResponse {
+export interface UserVerificationResponse {
   user: User;
 }
 

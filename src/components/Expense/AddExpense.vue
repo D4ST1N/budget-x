@@ -1,30 +1,55 @@
 <script setup lang="ts">
 import { required } from "@/helpers/inputValidations";
 import { useWalletStore } from "@/store/wallet";
+import { Expense } from "@/types/Expense";
 import { TagData } from "@/types/Tag";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useDate } from "vuetify";
-import DateSelectDialog from "../Dialog/DateSelectDialog.vue";
+import DateSelectDialog from "../Base/DateSelectDialog.vue";
 
 interface SelectOption {
   text: string;
   value: string;
   parent?: string;
 }
+
+interface AddExpenseProps {
+  expense?: Expense;
+  confirmButtonLabel?: string;
+}
+
+const emit = defineEmits(["update:expense"]);
+const props = withDefaults(defineProps<AddExpenseProps>(), {
+  confirmButtonLabel: "ui.add",
+});
 const date = useDate();
 const { t } = useI18n();
-
 const walletStore = useWalletStore();
-const { categoriesTree, tags } = storeToRefs(walletStore);
 
+const { categoriesTree, tags } = storeToRefs(walletStore);
 const valid = ref<boolean>(false);
-const selectedCategory = ref<string>();
+const selectedCategory = ref<string>("");
 const selectedTags = ref<(string | SelectOption)[]>([]);
-const amount = ref<number>();
+const amount = ref<number | undefined>();
 const selectedDate = ref<Date>(new Date());
 const isDateSelectionDialogOpen = ref<boolean>(false);
+
+if (props.expense) {
+  amount.value = props.expense.amount;
+  selectedCategory.value = props.expense.categoryId;
+  selectedTags.value = props.expense.tagIds.map((tagId) => {
+    const tag = tags.value.find((t) => t._id === tagId)!;
+
+    return {
+      text: tag.name,
+      value: tag._id,
+    };
+  });
+  selectedDate.value = new Date(props.expense.date);
+}
+
 const requiredField = required();
 
 const categoriesOptions = computed(() =>
@@ -68,46 +93,79 @@ function nextDay() {
 }
 
 async function createExpense() {
-  console.log(selectedCategory.value);
+  const { tags, success } = await formatTags(selectedTags.value);
 
-  const tagIds = await createNewTags(selectedTags.value);
+  if (!success) {
+    return;
+  }
+
+  if (props.expense) {
+    await walletStore.updateExpense(
+      {
+        categoryId: selectedCategory.value!,
+        tagIds: tags,
+        amount: amount.value!,
+        date: selectedDate.value,
+      },
+      props.expense._id
+    );
+
+    emit("update:expense");
+
+    return;
+  }
 
   await walletStore.createExpense({
     categoryId: selectedCategory.value!,
-    tagIds,
+    tagIds: tags,
     amount: amount.value!,
     date: selectedDate.value,
   });
 
   amount.value = undefined;
+  selectedTags.value = [];
 }
 
-async function createNewTags(
+async function formatTags(
   selectedTags: (string | SelectOption)[]
-): Promise<string[]> {
+): Promise<{ success: boolean; tags: string[] }> {
   const newTags = selectedTags.filter((tag) => typeof tag === "string");
 
   if (!newTags.length) {
-    return mapTags(selectedTags as SelectOption[]);
+    return {
+      success: true,
+      tags: mapTags(selectedTags as SelectOption[]),
+    };
   }
 
-  await walletStore.createTags(
+  const createdTags = await walletStore.createTags(
     newTags.map((tag) => ({ name: tag })) as TagData[]
   );
 
-  return mapTags(
-    selectedTags.map((tag) => {
-      if (typeof tag === "string") {
-        const createdTag = tags.value.find((t) => t.name === tag)!;
+  if (!createdTags) {
+    return {
+      success: false,
+      tags: [],
+    };
+  }
 
-        return {
-          text: createdTag.name,
-          value: createdTag._id,
-        };
-      }
-      return tag;
-    })
-  );
+  return {
+    success: true,
+    tags: mapTags(
+      selectedTags.map((tag) => {
+        if (typeof tag === "string") {
+          const createdTag = createdTags.find((t) => t.name === tag)!;
+
+          return {
+            text: createdTag.name,
+            value: createdTag._id,
+          };
+        }
+
+        return tag;
+      })
+    ),
+  };
 }
 
 function mapTags(tags: SelectOption[]): string[] {
@@ -120,6 +178,7 @@ function mapTags(tags: SelectOption[]): string[] {
     <v-form v-model="valid" @submit.prevent="createExpense">
       <div :class="$style.dateSelect">
         <v-btn icon="mdi-menu-left" variant="text" @click="previousDay"></v-btn>
+
         <v-btn
           color="primary"
           width="160"
@@ -127,6 +186,7 @@ function mapTags(tags: SelectOption[]): string[] {
         >
           {{ formattedDate }}
         </v-btn>
+
         <v-btn icon="mdi-menu-right" variant="text" @click="nextDay"></v-btn>
       </div>
 
@@ -137,6 +197,7 @@ function mapTags(tags: SelectOption[]): string[] {
         :rules="[requiredField]"
         item-title="text"
         item-value="value"
+        clearable
       >
         <template #item="{ item, props }">
           <v-list-item v-bind="props" :title="''">
@@ -174,14 +235,18 @@ function mapTags(tags: SelectOption[]): string[] {
       <v-divider></v-divider>
       <br />
 
-      <v-btn
-        :disabled="!valid"
-        type="submit"
-        variant="elevated"
-        color="primary"
-      >
-        {{ t("ui.add") }}
-      </v-btn>
+      <div :class="$style.actions">
+        <v-btn
+          :disabled="!valid"
+          type="submit"
+          variant="elevated"
+          color="primary"
+        >
+          {{ t(props.confirmButtonLabel) }}
+        </v-btn>
+
+        <slot name="actions" />
+      </div>
     </v-form>
   </v-card-text>
 
@@ -203,5 +268,10 @@ function mapTags(tags: SelectOption[]): string[] {
   :global(.v-chip__close) {
     background-color: transparent;
   }
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

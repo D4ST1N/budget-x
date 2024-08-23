@@ -7,7 +7,7 @@ import { Tag } from "@/types/Tag";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import ConfirmDialog from "../Dialog/ConfirmDialog.vue";
+import ListItem from "../Base/ListItem.vue";
 
 export interface TagProps {
   deleteAvailable?: boolean;
@@ -17,12 +17,10 @@ export interface TagProps {
 const props = withDefaults(defineProps<TagProps>(), {
   deleteAvailable: true,
 });
-
 const { t } = useI18n();
-
 const walletStore = useWalletStore();
-const { currentAccessLevel } = storeToRefs(walletStore);
 
+const { currentAccessLevel } = storeToRefs(walletStore);
 const isEditDialogOpen = ref<boolean>(false);
 
 const editAllowed = computed(() =>
@@ -41,44 +39,20 @@ function removeTag() {
 </script>
 
 <template>
-  <v-list-item :title="props.tag.name" :class="$style.tag" rounded>
-    <template #append>
-      <v-btn
-        v-if="editAllowed"
-        icon="mdi-pencil"
-        variant="text"
-        size="small"
-        @click="isEditDialogOpen = true"
-      ></v-btn>
+  <ListItem
+    :title="props.tag.name"
+    :edit-allowed="editAllowed"
+    :delete-allowed="deleteAllowed"
+    :delete-title="t('tag.deleteTag')"
+    :delete-message="
+      t('tag.removeTagMessage', {
+        tag: props.tag.name,
+      })
+    "
+    @edit="isEditDialogOpen = true"
+    @delete="removeTag"
+  >
+  </ListItem>
 
-      <ConfirmDialog
-        v-if="deleteAllowed"
-        :title="t('tag.deleteTag')"
-        :message="
-          t('tag.removeTagMessage', {
-            tag: props.tag.name,
-          })
-        "
-        :confirm="removeTag"
-      >
-        <template #activator="{ props: activatorProps }">
-          <v-btn
-            v-bind="activatorProps"
-            color="error"
-            icon="mdi-delete-alert"
-            variant="text"
-            size="small"
-          ></v-btn>
-        </template>
-      </ConfirmDialog>
-    </template>
-
-    <EditTagDialog v-model:is-open="isEditDialogOpen" :tag="props.tag" />
-  </v-list-item>
+  <EditTagDialog v-model:is-open="isEditDialogOpen" :tag="props.tag" />
 </template>
-
-<style lang="scss" module>
-.tag {
-  background-color: rgba(var(--v-theme-primary), 0.25);
-}
-</style>

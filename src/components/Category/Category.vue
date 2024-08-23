@@ -5,9 +5,9 @@ import { useWalletStore } from "@/store/wallet";
 import { AccessLevel } from "@/types/AccessLevel";
 import { Category } from "@/types/Category";
 import { storeToRefs } from "pinia";
-import { computed, ref, useCssModule } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import ConfirmDialog from "../Dialog/ConfirmDialog.vue";
+import ListItem from "../Base/ListItem.vue";
 
 export interface CategoryProps {
   subCategory?: boolean;
@@ -19,19 +19,11 @@ const props = withDefaults(defineProps<CategoryProps>(), {
   subCategory: false,
   deleteAvailable: true,
 });
-
 const { t } = useI18n();
-const styles = useCssModule();
 const walletStore = useWalletStore();
 
 const { currentAccessLevel } = storeToRefs(walletStore);
-
 const isEditDialogOpen = ref<boolean>(false);
-
-const categoryStyles = computed(() => ({
-  [styles.category]: true,
-  [styles.subCategory]: props.subCategory,
-}));
 
 const editAllowed = computed(() =>
   hasAccess([AccessLevel.UpdateCategory], currentAccessLevel.value)
@@ -49,57 +41,32 @@ function removeCategory() {
 </script>
 
 <template>
-  <v-list-item
+  <ListItem
     :title="props.category.name"
+    :edit-allowed="editAllowed"
+    :delete-allowed="deleteAllowed"
+    :delete-title="t('tag.deleteTag')"
+    :delete-message="
+      t('tag.removeTagMessage', {
+        tag: props.category.name,
+      })
+    "
     :density="props.subCategory ? 'compact' : 'default'"
-    :class="categoryStyles"
-    rounded
+    :additional-class="props.subCategory ? $style.subCategory : undefined"
+    @edit="isEditDialogOpen = true"
+    @delete="removeCategory"
   >
-    <template #append>
-      <v-btn
-        v-if="editAllowed"
-        icon="mdi-pencil"
-        variant="text"
-        size="small"
-        @click="isEditDialogOpen = true"
-      ></v-btn>
+  </ListItem>
 
-      <ConfirmDialog
-        v-if="deleteAllowed"
-        :title="t('category.deleteCategory')"
-        :message="
-          t('category.removeCategoryMessage', {
-            category: props.category.name,
-          })
-        "
-        :confirm="removeCategory"
-      >
-        <template #activator="{ props: activatorProps }">
-          <v-btn
-            v-bind="activatorProps"
-            color="error"
-            icon="mdi-delete-alert"
-            variant="text"
-            size="small"
-          ></v-btn>
-        </template>
-      </ConfirmDialog>
-    </template>
-
-    <EditCategoryDialog
-      v-model:is-open="isEditDialogOpen"
-      :category="props.category"
-    />
-  </v-list-item>
+  <EditCategoryDialog
+    v-model:is-open="isEditDialogOpen"
+    :category="props.category"
+  />
 </template>
 
 <style lang="scss" module>
-.category {
-  background-color: rgba(var(--v-theme-primary), 0.25);
-
-  &.subCategory {
-    margin-left: 16px;
-    background-color: rgba(var(--v-theme-primary), 0.15) !important;
-  }
+.subCategory {
+  margin-left: 16px;
+  background-color: var(--sub-item-bg);
 }
 </style>

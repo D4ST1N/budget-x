@@ -11,12 +11,10 @@ export interface TagCreationProps {
 }
 
 const props = defineProps<TagCreationProps>();
-
 const emit = defineEmits(["update:tag"]);
-
 const { t } = useI18n();
-
 const walletStore = useWalletStore();
+
 const tagName = ref<string>(props.tag?.name || "");
 const valid = ref<boolean>(false);
 const requiredField = required();

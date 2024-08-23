@@ -1,13 +1,11 @@
 import { verificationInterval } from "@/config/constants";
-import { verifyTokenUrl } from "@/helpers/serverUrls";
 import { fetchUserAvatar } from "@/helpers/utils";
-import { auth } from "@/plugins/axios";
 import stytch from "@/plugins/stytch";
-import ServerError from "@/types/ServerError";
-import { UserVerificationResponse } from "@/types/User";
 import { OAuthProviders, Products, User } from "@stytch/vanilla-js";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+
+import { verifyUserAction } from "./userActions/verifyUserAction";
 
 const REDIRECT_URL = `${import.meta.env.VITE_SERVER_URL}/auth`;
 
@@ -43,29 +41,18 @@ export const useUserStore = defineStore("user", () => {
     });
   }
 
-  async function verifyUser(token: string) {
-    try {
-      const response = await auth.post<UserVerificationResponse>(
-        verifyTokenUrl(),
-        JSON.stringify({ token })
-      );
+  async function verifyUser(token: string): Promise<boolean> {
+    const userData = await verifyUserAction({ token });
 
-      if (response.data.success) {
-        user.value = response.data.user;
-        user.value.providers[0].profile_picture_url = (await fetchUserAvatar(
-          user.value
-        )) as string;
-        lastVerificationTime.value = Date.now();
-      }
+    if (!userData) return false;
 
-      return response.data;
-    } catch (e) {
-      console.error(e);
-      return {
-        success: false,
-        error: ServerError.ServerConnectionFailed,
-      };
-    }
+    user.value = userData.user;
+    user.value.providers[0].profile_picture_url = (await fetchUserAvatar(
+      user.value
+    )) as string;
+    lastVerificationTime.value = Date.now();
+
+    return true;
   }
 
   return {

@@ -1,5 +1,3 @@
-import { SuccessServerResponse } from "./ServerResponse";
-
 export interface TagData {
   name: string;
 }
@@ -10,6 +8,16 @@ export interface Tag extends TagData {
   __v: number;
 }
 
-export interface SuccessWalletTagsFetchResponse extends SuccessServerResponse {
+export interface WalletTagsFetchResponse {
+  tags: Tag[];
+}
+
+export interface TagCreationResponse {
+  tag: Tag;
+}
+
+export interface TagUpdateResponse extends TagCreationResponse {}
+
+export interface TagsCreationResponse {
   tags: Tag[];
 }

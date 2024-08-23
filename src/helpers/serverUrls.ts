@@ -14,7 +14,7 @@ export const updateWalletUrl = (walletId: string) => `/wallet/${walletId}`;
 
 export const deleteWalletUrl = (walletId: string) => `/wallet/${walletId}`;
 
-export const getInvitationLinkUrl = (walletId: string) =>
+export const createInvitationLinkUrl = (walletId: string) =>
   `/wallet/${walletId}/invite`;
 
 export const getInvitationInfoUrl = (token: string) => `/wallet/join/${token}`;
@@ -30,39 +30,39 @@ export const updateWalletUserUrl = (walletId: string, userId: string) =>
 export const deleteWalletUserUrl = (walletId: string, userId: string) =>
   `/wallet/${walletId}/users/${userId}`;
 
-export const getWalletCategoriesUrl = (walletId: string) =>
+export const getCategoriesUrl = (walletId: string) =>
   `/wallet/${walletId}/category`;
 
-export const addWalletCategoryUrl = (walletId: string) =>
+export const addCategoryUrl = (walletId: string) =>
   `/wallet/${walletId}/category`;
 
-export const updateWalletCategoryUrl = (walletId: string, categoryId: string) =>
+export const updateCategoryUrl = (walletId: string, categoryId: string) =>
   `/wallet/${walletId}/category/${categoryId}`;
 
-export const deleteWalletCategoryUrl = (walletId: string, categoryId: string) =>
+export const deleteCategoryUrl = (walletId: string, categoryId: string) =>
   `/wallet/${walletId}/category/${categoryId}`;
 
-export const getWalletTagsUrl = (walletId: string) => `/wallet/${walletId}/tag`;
+export const getTagsUrl = (walletId: string) => `/wallet/${walletId}/tag`;
 
-export const addWalletTagUrl = (walletId: string) => `/wallet/${walletId}/tag`;
+export const addTagUrl = (walletId: string) => `/wallet/${walletId}/tag`;
 
-export const addWalletTagsBulkUrl = (walletId: string) =>
+export const addTagsBulkUrl = (walletId: string) =>
   `/wallet/${walletId}/tag/bulk`;
 
-export const updateWalletTagUrl = (walletId: string, tagId: string) =>
+export const updateTagUrl = (walletId: string, tagId: string) =>
   `/wallet/${walletId}/tag/${tagId}`;
 
-export const deleteWalletTagUrl = (walletId: string, tagId: string) =>
+export const deleteTagUrl = (walletId: string, tagId: string) =>
   `/wallet/${walletId}/tag/${tagId}`;
 
-export const getWalletExpensesUrl = (walletId: string) =>
+export const getExpensesUrl = (walletId: string) =>
   `/wallet/${walletId}/expense`;
 
-export const addWalletExpenseUrl = (walletId: string) =>
+export const addExpenseUrl = (walletId: string) =>
   `/wallet/${walletId}/expense`;
 
-export const updateWalletExpenseUrl = (walletId: string, expenseId: string) =>
+export const updateExpenseUrl = (walletId: string, expenseId: string) =>
   `/wallet/${walletId}/expense/${expenseId}`;
 
-export const deleteWalletExpenseUrl = (walletId: string, expenseId: string) =>
+export const deleteExpenseUrl = (walletId: string, expenseId: string) =>
   `/wallet/${walletId}/expense/${expenseId}`;

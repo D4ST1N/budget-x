@@ -3,6 +3,8 @@ import CategoryCreation from "@/components/Category/CategoryCreation.vue";
 import { Category } from "@/types/Category";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import BaseDialog from "../Base/BaseDialog.vue";
+import CloseButton from "../Base/CloseButton.vue";
 
 export interface EditCategoryDialogProps {
   isOpen: boolean;
@@ -10,9 +12,7 @@ export interface EditCategoryDialogProps {
 }
 
 const props = defineProps<EditCategoryDialogProps>();
-
 const emit = defineEmits(["update:isOpen"]);
-
 const { t } = useI18n();
 
 const showDialog = computed({
@@ -22,24 +22,18 @@ const showDialog = computed({
 </script>
 
 <template>
-  <v-dialog v-model="showDialog" width="400">
-    <v-card
-      max-width="400"
-      prepend-icon="mdi-file-edit"
-      :title="t('category.editCategory')"
+  <BaseDialog
+    v-model:isOpen="showDialog"
+    :title="t('category.editCategory')"
+    title-icon="mdi-file-edit"
+  >
+    <CategoryCreation
+      :category="props.category"
+      @update:category="showDialog = false"
     >
-      <template #default>
-        <CategoryCreation
-          :category="props.category"
-          @update:category="showDialog = false"
-        >
-          <template #actions>
-            <v-btn variant="text" @click="showDialog = false">
-              {{ t("ui.close") }}
-            </v-btn>
-          </template>
-        </CategoryCreation>
+      <template #actions>
+        <CloseButton @click="showDialog = false" />
       </template>
-    </v-card>
-  </v-dialog>
+    </CategoryCreation>
+  </BaseDialog>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ConfirmDialog from "@/components/Dialog/ConfirmDialog.vue";
+import ConfirmDialog from "@/components/Base/ConfirmDialog.vue";
 import UserEditDialog from "@/components/UserEditDialog/UserEditDialog.vue";
 import { hasAccess } from "@/helpers/utils";
 import { useUserStore } from "@/store/user";
@@ -11,9 +11,9 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
-
 const userStore = useUserStore();
 const walletStore = useWalletStore();
+
 const { user: currentUser } = storeToRefs(userStore);
 const { sharedUsers, fetchingWalletUsers, currentAccessLevel } =
   storeToRefs(walletStore);
@@ -72,6 +72,7 @@ async function removeUser(userId: string) {
 
         <template v-if="!isCurrentUser(user)" #append>
           <UserEditDialog v-if="editUserAvailable" :user="user" />
+
           <ConfirmDialog
             v-if="deleteUserAvailable"
             :title="t('wallet.removeUserTitle')"

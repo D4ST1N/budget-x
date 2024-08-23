@@ -2,7 +2,7 @@
 import WalletSettings from "@/components/Wallet/WalletSettings.vue";
 import { useWalletStore } from "@/store/wallet";
 import { storeToRefs } from "pinia";
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import DashboardPanel from "./DashboardPanel.vue";
@@ -10,11 +10,18 @@ import Expenses from "./Expenses.vue";
 
 const { t } = useI18n();
 const router = useRouter();
-
 const walletStore = useWalletStore();
+
 const { categories } = storeToRefs(walletStore);
+const categoriesFetched = ref<boolean>(false);
 
 const noCategoriesAdded = computed(() => categories.value.length === 0);
+
+onMounted(async () => {
+  await walletStore.waitForCategoriesLoaded();
+
+  categoriesFetched.value = true;
+});
 
 function addExpenseClick() {
   router.push({ name: "AddExpense" });
@@ -27,7 +34,7 @@ function addExpenseClick() {
 
     <Expenses :class="$style.main">
       <v-alert
-        v-if="noCategoriesAdded"
+        v-if="categoriesFetched && noCategoriesAdded"
         type="info"
         variant="tonal"
         density="compact"

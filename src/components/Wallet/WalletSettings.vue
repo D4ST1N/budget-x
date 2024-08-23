@@ -11,13 +11,11 @@ import DeleteWalletDialog from "./DeleteWalletDialog.vue";
 import EditWalletDialog from "./EditWalletDialog.vue";
 
 const router = useRouter();
-
 const i18n = useI18n();
 const { t } = i18n;
-
 const walletStore = useWalletStore();
-const { currentAccessLevel } = storeToRefs(walletStore);
 
+const { currentAccessLevel } = storeToRefs(walletStore);
 const isWalletEditDialogOpen = ref<boolean>(false);
 const isWalletDeleteDialogOpen = ref<boolean>(false);
 const isWalletShareDialogOpen = ref<boolean>(false);
@@ -66,6 +64,15 @@ const items = computed(() => [
     color: "primary",
     onSelect: () => {
       isWalletShareDialogOpen.value = true;
+    },
+  },
+  {
+    title: t("expense.viewExpenses"),
+    icon: "mdi-cash",
+    hasAccess: hasAccess([AccessLevel.View], currentAccessLevel.value),
+    color: "primary",
+    onSelect: () => {
+      router.push({ name: "Expenses" });
     },
   },
   {

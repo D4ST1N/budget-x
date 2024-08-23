@@ -1,5 +1,3 @@
-import { SuccessServerResponse } from "./ServerResponse";
-
 export interface CategoryData {
   name: string;
   parentCategory: string | null;
@@ -15,7 +13,12 @@ export interface CategoryTreeElement extends Category {
   subCategories: Category[];
 }
 
-export interface SuccessWalletCategoriesFetchResponse
-  extends SuccessServerResponse {
+export interface CategoryCreationResponse {
+  category: Category;
+}
+
+export interface CategoryUpdateResponse extends CategoryCreationResponse {}
+
+export interface FetchCategoriesResponse {
   categories: Category[];
 }

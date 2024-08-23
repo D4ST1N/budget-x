@@ -21,7 +21,7 @@ const walletStore = useWalletStore();
 const categoryName = ref<string>(props.category?.name || "");
 const valid = ref<boolean>(false);
 const isSubCategory = ref<boolean>(
-  props.category?.parentCategory !== null || false
+  (props.category && props.category.parentCategory !== null) || false
 );
 const selectedCategory = ref<string | null>(
   props.category?.parentCategory || null

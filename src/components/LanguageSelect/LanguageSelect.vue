@@ -41,6 +41,7 @@ function updateLanguage(locale: string) {
     <template #prepend-inner>
       <img :src="getFlagUrl(locale)" :alt="locale" :class="$style.flagMain" />
     </template>
+
     <template #item="{ props, item }">
       <v-list-item v-bind="props">
         <template #prepend>

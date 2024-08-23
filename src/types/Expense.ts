@@ -1,5 +1,4 @@
 import { Category } from "./Category";
-import { SuccessServerResponse } from "./ServerResponse";
 import { Tag } from "./Tag";
 
 export interface ExpenseData {
@@ -15,12 +14,24 @@ export interface Expense extends ExpenseData {
   __v: number;
 }
 
+export interface ExpenseEnriched {
+  expense: Expense;
+  category: Category;
+  tags: Tag[];
+}
+
 export interface ExpensesData {
   expenses: Expense[];
   categories: Category[];
   tags: Tag[];
 }
 
-export interface SuccessWalletExpensesFetchResponse
-  extends SuccessServerResponse,
-    ExpensesData {}
+export interface ExpenseCreationResponse {
+  expense: Expense;
+}
+
+export interface ExpenseUpdateResponse {
+  expense: Expense;
+}
+
+export interface ExpensesFetchResponse extends ExpensesData {}

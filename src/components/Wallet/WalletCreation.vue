@@ -8,8 +8,9 @@ const { t } = useI18n();
 const walletStore = useWalletStore();
 
 const walletName = ref<string>("");
-const requiredField = required();
 const valid = ref<boolean>(false);
+
+const requiredField = required();
 
 function createWallet() {
   walletStore.createWallet(walletName.value);

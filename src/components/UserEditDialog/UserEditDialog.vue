@@ -6,6 +6,7 @@ import { UserData } from "@/types/User";
 import { storeToRefs } from "pinia";
 import { ref, Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import CloseButton from "../Base/CloseButton.vue";
 
 const props = defineProps<{
   user: UserData;
@@ -19,7 +20,7 @@ const accessLevels = walletStore.getUserAccess(props.user.user_id);
 const selectedAccessLevels = ref<AccessLevel[]>([...accessLevels]);
 
 async function confirm(isActive: Ref<boolean>) {
-  await walletStore.editWalletUser(
+  await walletStore.updateWalletUser(
     props.user.user_id,
     selectedAccessLevels.value
   );
@@ -62,13 +63,11 @@ async function confirm(isActive: Ref<boolean>) {
         </v-card-text>
 
         <v-card-actions>
-          <v-btn @click="isActive.value = false" color="error">
-            {{ t("ui.cancel") }}
-          </v-btn>
-
           <v-btn @click="confirm(isActive)" color="primary" variant="elevated">
             {{ t("ui.save") }}
           </v-btn>
+
+          <CloseButton @click="isActive.value = false" />
         </v-card-actions>
       </v-card>
     </template>

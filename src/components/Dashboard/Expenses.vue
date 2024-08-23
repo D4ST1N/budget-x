@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { generateColorFromHash } from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallet";
-import { ExpensesData } from "@/types/Expense";
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import DashboardPanel from "./DashboardPanel.vue";
@@ -13,8 +12,8 @@ interface ChartData {
 }
 
 const { t, n } = useI18n();
-
 const walletStore = useWalletStore();
+
 const chartData = ref<ChartData[]>([]);
 const chartContainer = ref<InstanceType<typeof DashboardPanel> | null>(null);
 const containerWidth = ref<number>(360);
@@ -36,13 +35,6 @@ const chartOptions = computed(() => {
       style: {
         color: "#FFFFFF",
       },
-    },
-    subtitle: {
-      useHTML: true,
-      text: `<div style="display: flex; align-items: center; flex-direction: column; color: #FFFFFF"><span style="font-size: 12px">${t("wallet.total")}</span><div style="font-size: 14px"><b>${n(totalAmount.value, "currency")}</b></div></div>`,
-      floating: true,
-      verticalAlign: "middle",
-      y: 25,
     },
     plotOptions: {
       pie: {
@@ -73,14 +65,20 @@ const chartOptions = computed(() => {
 
 onMounted(() => {
   if (chartContainer.value) {
-    containerWidth.value = chartContainer.value.$el.clientWidth;
+    containerWidth.value = Math.min(
+      chartContainer.value.$el.clientWidth,
+      chartContainer.value.$el.clientHeight
+    );
     getData();
   }
 });
 
 async function getData() {
-  const { expenses, categories }: ExpensesData =
-    await walletStore.fetchWalletExpenses();
+  const expensesData = await walletStore.fetchExpenses();
+
+  if (!expensesData) return;
+
+  const { expenses, categories } = expensesData;
 
   const categoryTotals: Record<string, number> = {};
 
@@ -110,12 +108,7 @@ async function getData() {
   <DashboardPanel ref="chartContainer" :class="$style.container">
     <slot />
     <highcharts :options="chartOptions" :class="$style.chart"></highcharts>
-    <v-btn variant="text" :to="{ name: 'Statistic' }">
-      <template #prepend>
-        <v-icon>mdi-chart-bar-stacked</v-icon>
-      </template>
-      {{ t("wallet.detail") }}
-    </v-btn>
+    <div>{{ t("wallet.total") }}: {{ n(totalAmount, "currency") }}</div>
   </DashboardPanel>
 </template>
 
@@ -124,7 +117,9 @@ async function getData() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 6px;
 }
 
 .chart {

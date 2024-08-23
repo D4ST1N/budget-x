@@ -1,5 +1,3 @@
-import { SuccessServerResponse } from "@/types/ServerResponse";
-
 import { AccessLevel } from "./AccessLevel";
 import { UserData } from "./User";
 
@@ -17,24 +15,24 @@ export interface Wallet extends WalletData {
   __v: number;
 }
 
-export interface SuccessWalletFetchResponse extends SuccessServerResponse {
+export interface WalletFetchResponse {
   wallets: Wallet[];
   sharedWallets: Wallet[];
 }
 
-export interface SuccessWalletCreationResponse extends SuccessServerResponse {
+export interface WalletCreationResponse {
   walletId: string;
 }
 
-export interface SuccessWalletShareResponse extends SuccessServerResponse {
+export interface WalletShareResponse {
   token: string;
 }
 
-export interface SuccessWalletUsersFetchResponse extends SuccessServerResponse {
+export interface WalletUsersFetchResponse {
   users: UserData[];
 }
 
-export interface SuccessInvitationInfoResponse extends SuccessServerResponse {
+export interface InvitationInfoResponse {
   walletName: string;
   creator: UserData;
 }

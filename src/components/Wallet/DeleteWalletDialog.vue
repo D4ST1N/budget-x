@@ -2,13 +2,12 @@
 import { useWalletStore } from "@/store/wallet";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import BaseDialog from "../Base/BaseDialog.vue";
 
 const props = defineProps({
   isOpen: Boolean,
 });
-
 const emit = defineEmits(["update:isOpen"]);
-
 const { t } = useI18n();
 const walletStore = useWalletStore();
 
@@ -24,22 +23,23 @@ function onDeleteClick() {
 </script>
 
 <template>
-  <v-dialog v-model="showDialog" width="400">
-    <v-card
-      max-width="400"
-      prepend-icon="mdi-delete"
-      :title="t('wallet.removeWalletTitle')"
-      :text="t('wallet.removeWalletMessage')"
-    >
-      <template #actions>
-        <v-btn variant="text" color="error" @click="onDeleteClick">
-          {{ t("ui.delete") }}
-        </v-btn>
+  <BaseDialog
+    v-model:isOpen="showDialog"
+    :title="t('wallet.removeWalletTitle')"
+    title-icon="mdi-delete"
+  >
+    <v-card-text>
+      {{ t("wallet.removeWalletMessage") }}
+    </v-card-text>
 
-        <v-btn variant="elevated" @click="showDialog = false">
-          {{ t("ui.cancel") }}
-        </v-btn>
-      </template>
-    </v-card>
-  </v-dialog>
+    <template #actions>
+      <v-btn variant="elevated" @click="showDialog = false">
+        {{ t("ui.cancel") }}
+      </v-btn>
+
+      <v-btn variant="text" color="error" @click="onDeleteClick">
+        {{ t("ui.delete") }}
+      </v-btn>
+    </template>
+  </BaseDialog>
 </template>

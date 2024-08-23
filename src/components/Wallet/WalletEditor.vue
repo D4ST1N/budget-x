@@ -9,15 +9,14 @@ import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 const emit = defineEmits(["on-save"]);
-
 const { t } = useI18n();
 const walletStore = useWalletStore();
 
 const { currentWallet, currentAccessLevel } = storeToRefs(walletStore);
 const newWallet = ref({ ...currentWallet.value });
+const valid = ref<boolean>(false);
 
 const requiredField = required();
-const valid = ref<boolean>(false);
 
 const editAvailable = computed(() =>
   hasAccess([AccessLevel.Update], currentAccessLevel.value)
@@ -28,7 +27,7 @@ const isChanged = computed(
 );
 
 function updateWallet() {
-  walletStore.updateWalletName(newWallet.value as Wallet);
+  walletStore.updateWallet(newWallet.value as Wallet);
   emit("on-save");
 }
 </script>

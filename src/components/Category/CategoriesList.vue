@@ -68,13 +68,5 @@ function openAddCategoryDialog() {
     margin-top: 4px;
     padding-left: 16px;
   }
-
-  :global(.v-list-item) {
-    background-color: rgba(var(--v-theme-primary), 0.25);
-  }
-}
-
-.subCategory {
-  background-color: rgba(var(--v-theme-primary), 0.15) !important;
 }
 </style>
