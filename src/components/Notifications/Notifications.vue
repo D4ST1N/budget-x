@@ -42,7 +42,7 @@ function getNotificationColor(notification: Notification) {
   left: 0;
   padding: 20px;
   width: 100%;
-  z-index: 1010;
+  z-index: 2500;
   pointer-events: none;
 }
 

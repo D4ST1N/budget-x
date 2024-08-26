@@ -1,21 +1,43 @@
 <script setup lang="ts">
-import { formatDate } from "@/helpers/utils";
+import {
+  enrichExpenses,
+  formatDate,
+  groupExpensesByDate,
+} from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallet";
-import { Category } from "@/types/Category";
 import { ExpenseEnriched } from "@/types/Expense";
-import { Tag } from "@/types/Tag";
-import { computed, ref } from "vue";
+import { storeToRefs } from "pinia";
+import { computed, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { useDate } from "vuetify";
+import { VList } from "vuetify/components";
+import DashboardPanel from "../Dashboard/DashboardPanel.vue";
 import ExpenseItem from "./Expense.vue";
 
+const { t } = useI18n();
 const date = useDate();
 const walletStore = useWalletStore();
 
+const { currentWallet } = storeToRefs(walletStore);
 const selectedDate = ref(new Date());
 const expenses = ref<ExpenseEnriched[]>([]);
+const expanded = ref<boolean>(false);
 const isCalendarOpen = ref(false);
+const list = ref<InstanceType<typeof VList> | null>(null);
 
-const fetchExpenses = async () => {
+const groupedExpenses = computed(() => {
+  return groupExpensesByDate(expenses.value, date);
+});
+
+watch(currentWallet, () => {
+  fetchExpenses();
+});
+
+fetchExpenses();
+
+async function fetchExpenses() {
+  expenses.value = [];
+
   const startDate = formatDate(
     date.startOfMonth(selectedDate.value) as string,
     "YYYY-MM-DD"
@@ -28,93 +50,71 @@ const fetchExpenses = async () => {
   const expensesData = await walletStore.fetchExpenses({ startDate, endDate });
 
   if (!expensesData) {
-    expenses.value = [];
-
     return;
   }
 
-  const categoryMap = new Map<string, Category>();
-  const tagMap = new Map<string, Tag>();
+  expenses.value = enrichExpenses(expensesData);
+}
 
-  expensesData.categories.forEach((category) => {
-    categoryMap.set(category._id, category);
-  });
-
-  expensesData.tags.forEach((tag) => {
-    tagMap.set(tag._id, tag);
-  });
-
-  const enrichedExpenses = expensesData.expenses.map((expense) => {
-    const category = categoryMap.get(expense.categoryId) || null;
-    const tags = expense.tagIds
-      .map((tagId) => tagMap.get(tagId))
-      .filter(Boolean) as Tag[];
-
-    return {
-      expense,
-      category,
-      tags,
-    } as ExpenseEnriched;
-  });
-
-  expenses.value = enrichedExpenses;
-};
-
-fetchExpenses();
-
-const previousMonth = () => {
+function previousMonth() {
   selectedDate.value = date.addMonths(selectedDate.value, -1) as Date;
   fetchExpenses();
-};
+}
 
-const nextMonth = () => {
+function nextMonth() {
   selectedDate.value = date.addMonths(selectedDate.value, 1) as Date;
-  console.log(selectedDate.value);
   fetchExpenses();
-};
+}
 
-const groupedExpenses = computed(() => {
-  return expenses.value.reduce(
-    (groups: Record<string, ExpenseEnriched[]>, expense) => {
-      const dayDate = date.format(
-        expense.expense.date,
-        "normalDateWithWeekday"
-      );
+function collapse() {
+  selectedDate.value = new Date();
+  expanded.value = false;
+  list.value?.$el.scrollTo(0, 0);
+}
 
-      if (!groups[dayDate]) {
-        groups[dayDate] = [];
-      }
-
-      groups[dayDate].push(expense);
-
-      return groups;
-    },
-    {}
-  );
-});
+function showAllExpenses() {
+  expanded.value = true;
+}
 </script>
 
 <template>
-  <v-card>
-    <div :class="$style.dateSelect">
-      <v-btn icon="mdi-menu-left" variant="text" @click="previousMonth"></v-btn>
+  <DashboardPanel :class="$style.container">
+    <slot />
 
-      <v-btn color="primary" width="160" @click="isCalendarOpen = true">
-        {{ date.format(selectedDate, "monthAndYear") }}
-      </v-btn>
-
-      <v-btn icon="mdi-menu-right" variant="text" @click="nextMonth"></v-btn>
+    <div :class="$style.header">
+      {{ t("expense.latestExpenses") }}
     </div>
 
-    <v-dialog v-model="isCalendarOpen" max-width="290">
-      <v-date-picker
-        v-model="selectedDate"
-        type="month"
-        @change="fetchExpenses"
-      />
-    </v-dialog>
+    <v-list
+      ref="list"
+      :class="{ [$style.list]: true, [$style.expanded]: expanded }"
+    >
+      <div v-show="expanded" :class="$style.dateSelect">
+        <v-btn
+          icon="mdi-menu-left"
+          variant="text"
+          @click="previousMonth"
+        ></v-btn>
 
-    <v-list :class="$style.list">
+        <v-btn color="primary" width="160" @click="isCalendarOpen = true">
+          {{ date.format(selectedDate, "monthAndYear") }}
+        </v-btn>
+
+        <v-btn icon="mdi-menu-right" variant="text" @click="nextMonth"></v-btn>
+      </div>
+
+      <v-dialog v-model="isCalendarOpen">
+        <v-date-picker
+          v-model="selectedDate"
+          type="month"
+          @change="fetchExpenses"
+        />
+      </v-dialog>
+
+      <v-list-subheader v-if="expenses.length === 0">
+        {{ t("expense.noExpensesThisMonth") }}
+      </v-list-subheader>
+
       <template v-for="(dailyExpenses, date) in groupedExpenses" :key="date">
         <v-list-subheader sticky :class="$style.dateHeader">
           {{ date }}
@@ -124,32 +124,146 @@ const groupedExpenses = computed(() => {
           v-for="expense in dailyExpenses"
           :key="expense.expense._id"
           :expense="expense"
+          :delete-available="expanded"
+          :edit-available="expanded"
           @update:expense="fetchExpenses"
           @delete:expense="fetchExpenses"
         >
         </ExpenseItem>
       </template>
+
+      <div
+        :class="{ [$style.topPanel]: true, [$style.visibleTopPanel]: expanded }"
+      >
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          color="white"
+          @click="collapse"
+        ></v-btn>
+      </div>
     </v-list>
-  </v-card>
+
+    <div v-show="!expanded && expenses.length" :class="$style.bottomPanel">
+      <v-btn variant="text" color="primary" @click="showAllExpenses">
+        {{ t("expense.seeAllExpenses") }}
+      </v-btn>
+    </div>
+  </DashboardPanel>
 </template>
 
 <style lang="scss" module>
-.dateSelect {
+.container {
+  --latest-expenses-title-height: 40px;
+  --container-height: calc(
+    var(--content-height) - var(--dashboard-padding) * 2 - var(
+        --dashboard-header-height
+      ) - var(--dashboard-button-height) - var(--dashboard-badge-height)
+  );
+
+  position: relative;
+}
+
+.header {
+  height: var(--latest-expenses-title-height);
+  font-size: 18px;
+  padding: 6px 16px;
   display: flex;
-  justify-content: center;
-  margin-top: 6px;
+  justify-content: space-between;
   align-items: center;
 }
 
+.dateSelect {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: rgb(62 56 53);
+}
+
 .list {
+  --collapsed-height: calc(
+    var(--container-height) - var(--latest-expenses-title-height) - var(
+        --dashboard-padding
+      ) * 2
+  );
+
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 0 12px 6px;
-  max-height: calc(var(--content-height) - 54px);
+  background-color: rgb(36 28 25);
+
+  max-height: var(--collapsed-height);
+  height: var(--collapsed-height);
+  overflow: hidden;
+  position: relative;
+  transition: all 0.375s ease;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  &.expanded {
+    max-height: var(--content-height);
+    height: var(--content-height);
+    width: calc(100% + var(--dashboard-padding) * 2);
+    left: -6px;
+    top: calc(
+      (
+          var(--latest-expenses-title-height) + var(--dashboard-header-height) +
+            var(--dashboard-padding) * 2
+        ) * -1
+    );
+    overflow: auto;
+    background: rgb(62 56 53);
+    z-index: 1;
+
+    .bottomPanel {
+      opacity: 0;
+    }
+
+    .dateHeader {
+      top: 48px;
+    }
+  }
 }
 
 .dateHeader {
-  background: rgb(83 71 76);
+  background: rgb(62 56 53);
+}
+
+.topPanel {
+  position: fixed;
+  top: calc(var(--v-layout-top) + var(--page-margin));
+  right: var(--page-margin);
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+
+  &.visibleTopPanel {
+    opacity: 1;
+    pointer-events: all;
+    transition: opacity 0.25s ease 0.375s;
+  }
+}
+
+.bottomPanel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 30px;
+  background: linear-gradient(
+    to bottom,
+    rgba(63, 56, 53, 0) 0%,
+    rgb(63, 56, 53) 50%
+  );
+  z-index: 1;
 }
 </style>

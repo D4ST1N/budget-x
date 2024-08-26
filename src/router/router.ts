@@ -110,15 +110,6 @@ const routes = [
           accessLevel: [AccessLevel.CreateExpense],
         },
       },
-      {
-        path: "expenses",
-        name: "Expenses",
-        component: () => import("@/components/Expense/ExpensesList.vue"),
-        meta: {
-          titleKey: "expense.expensesTitle",
-          accessLevel: [AccessLevel.View],
-        },
-      },
     ],
     meta: {
       authRequired: true,

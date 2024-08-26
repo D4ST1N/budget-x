@@ -5,8 +5,8 @@ import { storeToRefs } from "pinia";
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import ExpensesList from "../Expense/ExpensesList.vue";
 import DashboardPanel from "./DashboardPanel.vue";
-import Expenses from "./Expenses.vue";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -32,7 +32,7 @@ function addExpenseClick() {
   <div :class="$style.container">
     <WalletSettings :class="$style.header" />
 
-    <Expenses :class="$style.main">
+    <ExpensesList :class="$style.main">
       <v-alert
         v-if="categoriesFetched && noCategoriesAdded"
         type="info"
@@ -50,7 +50,7 @@ function addExpenseClick() {
           </v-btn>
         </div>
       </v-alert>
-    </Expenses>
+    </ExpensesList>
 
     <DashboardPanel v-ripple :class="$style.expense" @click="addExpenseClick">
       <div :class="$style.tileButton">
@@ -70,22 +70,35 @@ function addExpenseClick() {
 
 <style lang="scss" module>
 .container {
+  --dashboard-button-height: 0px;
+  --dashboard-padding: 6px;
+  --dashboard-header-height: 36px;
+  --dashboard-badge-height: 0px;
+
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 100px;
+  grid-template-rows: 1fr var(--dashboard-button-height);
   grid-template-areas:
     "main main"
     "expense income";
   height: 100%;
-  padding: 6px;
+  padding: var(--dashboard-padding);
   gap: 6px;
 
   &:has(.header:first-child) {
-    grid-template-rows: 36px 1fr 100px;
+    --dashboard-button-height: 100px;
+
+    grid-template-rows: var(--dashboard-header-height) 1fr var(
+        --dashboard-button-height
+      );
     grid-template-areas:
       "header header"
       "main main"
       "expense income";
+  }
+
+  &:has(.badge) {
+    --dashboard-badge-height: 100px;
   }
 }
 

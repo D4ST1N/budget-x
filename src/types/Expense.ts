@@ -17,6 +17,7 @@ export interface Expense extends ExpenseData {
 export interface ExpenseEnriched {
   expense: Expense;
   category: Category;
+  parentCategory: Category;
   tags: Tag[];
 }
 

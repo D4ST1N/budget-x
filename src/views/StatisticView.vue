@@ -1,12 +1,10 @@
 <script setup lang="ts">
+import Expenses from "@/components/Dashboard/Expenses.vue";
 import BaseLayout from "@/layouts/Base.vue";
-import { useI18n } from "vue-i18n";
-
-const { t } = useI18n();
 </script>
 
 <template>
   <BaseLayout>
-    <v-card-title>{{ t("statistic.title") }}</v-card-title>
+    <Expenses />
   </BaseLayout>
 </template>

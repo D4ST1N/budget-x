@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { handleServerError } from "@/helpers/handleServerError";
 import { getInvitationInfoUrl, joinWalletUrl } from "@/helpers/serverUrls";
 import { fetchUserAvatar } from "@/helpers/utils";
 import { api } from "@/plugins/axios";
@@ -7,7 +8,7 @@ import { useUserStore } from "@/store/user";
 import { NotificationType } from "@/types/Notification";
 import { ServerResponseError } from "@/types/ServerResponse";
 import { UserData } from "@/types/User";
-import { SuccessInvitationInfoResponse } from "@/types/Wallet";
+import { InvitationInfoResponse } from "@/types/Wallet";
 import { AxiosResponse } from "axios";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
@@ -39,24 +40,16 @@ onBeforeRouteLeave(() => {
 
 async function fetchInvitationInfo() {
   try {
-    const response: AxiosResponse<
-      SuccessInvitationInfoResponse | ServerResponseError
-    > = await api.get(getInvitationInfoUrl(token));
+    const response: AxiosResponse<InvitationInfoResponse> = await api.get(
+      getInvitationInfoUrl(token)
+    );
     loading.value = false;
 
-    if (response.data.success) {
-      walletName.value = response.data.walletName;
-      creator.value = response.data.creator;
-      creatorAvatar.value = await fetchUserAvatar(response.data.creator);
-    } else {
-      notificationId = notificationStore.add({
-        text: t(`errors.${response.data.errorType}`),
-        type: NotificationType.Error,
-        timeout: -1,
-      });
-    }
-  } catch (error) {
-    console.error(error);
+    walletName.value = response.data.walletName;
+    creator.value = response.data.creator;
+    creatorAvatar.value = await fetchUserAvatar(response.data.creator);
+  } catch (error: ServerResponseError | any) {
+    handleServerError(error);
   }
 }
 

@@ -11,6 +11,7 @@ export default {
     noPermission: "У вас немає доступу до цієї сторінки",
     selectDate: "Оберіть дату",
     add: "Додати",
+    leave: "Покинути",
   },
   currency: {
     style: "currency",
@@ -19,6 +20,8 @@ export default {
   unit: {
     hour: "Година",
     minute: "Хвилина",
+    month: "Місяць",
+    year: "Рік",
   },
   accessLevel: {
     View: "Перегляд",
@@ -73,12 +76,23 @@ export default {
     InvitationExpired: "Час дії посилання минув",
     InvitationRunOut: "Кількість приєднань по цьому посиланню вичерпано",
     AvatarFetchError: "Не вдалось отримати аватар",
+    CategoryAlreadyExists: "Категорія з такою назвою вже існує",
+    TagAlreadyExists: "Тег з такою назвою вже існує",
   },
   home: {
     title: "Інформація про гаманці",
   },
   statistic: {
     title: "Статистика",
+    byCategory: "За категоріями",
+    byDay: "За днями",
+    byMonth: "За місяцями",
+    monthExpenses: "Витрати за",
+    dailyExpenses: "Витрати за день",
+    monthlyExpenses: "Витрати за місяць",
+    total: "Всього",
+    period: "Період",
+    graphType: "Тип графіка",
   },
   profile: {
     title: "Профіль",
@@ -116,8 +130,9 @@ export default {
     accessLevels: "Рівні доступу",
     generate: "Згенерувати",
     editAccess: "Редагувати доступ",
-    monthExpenses: "Витрати цього місяця",
-    total: "Всього",
+    leaveWallet: "Покинути гаманець",
+    leaveWalletTitle: "Покинути гаманець",
+    leaveWalletText: "Ви впевнені, що хочете покинути гаманець?",
   },
   category: {
     noCategoriesAdded: "В гаманці поки що немає жодної категорії",
@@ -155,6 +170,9 @@ export default {
     deleteExpense: "Видалити витрату",
     deleteExpenseText: "Ви впевнені, що хочете видалити витрату?",
     editExpense: "Редагувати витрату",
+    latestExpenses: "Останні витрати",
+    seeAllExpenses: "Переглянути всі витрати",
+    noExpensesThisMonth: "В цьому місяці витрати відсутні",
   },
   users: {
     users: "Користувачі",

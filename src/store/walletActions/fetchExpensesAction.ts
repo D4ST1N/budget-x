@@ -10,6 +10,7 @@ export interface ExpensesFilters {
   endDate?: string;
   categories?: string[];
   tags?: string[];
+  limit?: number;
 }
 
 export async function fetchExpensesAction({

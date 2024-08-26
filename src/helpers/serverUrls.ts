@@ -21,6 +21,8 @@ export const getInvitationInfoUrl = (token: string) => `/wallet/join/${token}`;
 
 export const joinWalletUrl = (token: string) => `/wallet/join/${token}`;
 
+export const leaveWalletUrl = (walletId: string) => `/wallet/${walletId}/leave`;
+
 export const getWalletUsersUrl = (walletId: string) =>
   `/wallet/${walletId}/users`;
 

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import UserProfileLayout from "@/layouts/UserProfile.vue";
 import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
 const { t } = useI18n();
+const router = useRouter();
 
 function logoutClick() {
-  console.log("logout");
+  sessionStorage.removeItem("session_token");
+  router.push({ name: "Login" });
 }
 </script>
 

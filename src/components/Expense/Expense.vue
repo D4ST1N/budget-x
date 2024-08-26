@@ -11,12 +11,14 @@ import EditExpenseDialog from "./EditExpenseDialog.vue";
 
 export interface ExpenseProps {
   deleteAvailable?: boolean;
+  editAvailable?: boolean;
   expense: ExpenseEnriched;
 }
 
 const emit = defineEmits(["update:expense", "delete:expense"]);
 const props = withDefaults(defineProps<ExpenseProps>(), {
   deleteAvailable: true,
+  editAvailable: true,
 });
 const { t, n } = useI18n();
 const walletStore = useWalletStore();
@@ -24,8 +26,10 @@ const walletStore = useWalletStore();
 const { currentAccessLevel } = storeToRefs(walletStore);
 const isExpenseEditDialogOpen = ref<boolean>(false);
 
-const editAllowed = computed(() =>
-  hasAccess([AccessLevel.UpdateExpense], currentAccessLevel.value)
+const editAllowed = computed(
+  () =>
+    hasAccess([AccessLevel.UpdateExpense], currentAccessLevel.value) &&
+    props.editAvailable
 );
 
 const deleteAllowed = computed(

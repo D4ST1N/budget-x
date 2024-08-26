@@ -171,6 +171,28 @@ async function formatTags(
 function mapTags(tags: SelectOption[]): string[] {
   return tags.map((tag) => tag.value);
 }
+
+interface InternalItem<T = any> {
+  value: any;
+  raw: T;
+}
+
+function filterResults(
+  itemText: string,
+  query: string,
+  item?: InternalItem<SelectOption>
+) {
+  if (!item) {
+    return false;
+  }
+
+  const hasParent =
+    item.raw.parent &&
+    item.raw.parent.toLowerCase().includes(query.toLowerCase());
+  const hasText = itemText.toLowerCase().includes(query.toLowerCase());
+
+  return hasParent || hasText;
+}
 </script>
 
 <template>
@@ -195,6 +217,7 @@ function mapTags(tags: SelectOption[]): string[] {
         :items="categoriesOptions"
         :label="t('category.category')"
         :rules="[requiredField]"
+        :custom-filter="filterResults"
         item-title="text"
         item-value="value"
         clearable

@@ -9,16 +9,18 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import DeleteWalletDialog from "./DeleteWalletDialog.vue";
 import EditWalletDialog from "./EditWalletDialog.vue";
+import LeaveWalletDialog from "./LeaveWalletDialog.vue";
 
 const router = useRouter();
 const i18n = useI18n();
 const { t } = i18n;
 const walletStore = useWalletStore();
 
-const { currentAccessLevel } = storeToRefs(walletStore);
+const { currentAccessLevel, isSharedWallet } = storeToRefs(walletStore);
 const isWalletEditDialogOpen = ref<boolean>(false);
 const isWalletDeleteDialogOpen = ref<boolean>(false);
 const isWalletShareDialogOpen = ref<boolean>(false);
+const isWalletLeaveDialogOpen = ref<boolean>(false);
 
 const items = computed(() => [
   {
@@ -67,12 +69,14 @@ const items = computed(() => [
     },
   },
   {
-    title: t("expense.viewExpenses"),
-    icon: "mdi-cash",
-    hasAccess: hasAccess([AccessLevel.View], currentAccessLevel.value),
-    color: "primary",
+    title: t("wallet.leaveWallet"),
+    icon: "mdi-exit-to-app",
+    hasAccess:
+      isSharedWallet.value &&
+      hasAccess([AccessLevel.View], currentAccessLevel.value),
+    color: "error",
     onSelect: () => {
-      router.push({ name: "Expenses" });
+      isWalletLeaveDialogOpen.value = true;
     },
   },
   {
@@ -122,6 +126,7 @@ const availableItems = computed(() =>
 
     <EditWalletDialog v-model:isOpen="isWalletEditDialogOpen" />
     <DeleteWalletDialog v-model:isOpen="isWalletDeleteDialogOpen" />
+    <LeaveWalletDialog v-model:isOpen="isWalletLeaveDialogOpen" />
     <ShareLinkDialog v-model:is-open="isWalletShareDialogOpen" />
   </div>
 </template>

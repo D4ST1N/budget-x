@@ -83,6 +83,12 @@ export const useWalletStore = defineStore(
       return [];
     });
 
+    const isSharedWallet = computed(() => {
+      if (!currentWallet.value || !user.value) return false;
+
+      return currentWallet.value.creator !== user.value.user_id;
+    });
+
     const allWallets = computed(() => [
       ...wallets.value,
       ...sharedWallets.value,
@@ -575,6 +581,7 @@ export const useWalletStore = defineStore(
       rootCategories,
       categoriesTree,
       tags,
+      isSharedWallet,
       selectWallet,
       waitForAccessLevelsLoaded,
       waitForCategoriesLoaded,

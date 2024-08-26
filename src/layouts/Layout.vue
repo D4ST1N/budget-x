@@ -57,11 +57,14 @@ onMounted(() => {
 }
 
 .page {
-  margin: 16px;
-  flex-grow: 1;
+  --page-margin: 16px;
   --content-height: calc(
-    100vh - var(--v-layout-top) - var(--v-layout-bottom) - 32px
+    100vh - var(--v-layout-top) - var(--v-layout-bottom) - var(--page-margin) *
+      2
   );
+
+  margin: var(--page-margin);
+  flex-grow: 1;
   max-height: var(--content-height);
 }
 
