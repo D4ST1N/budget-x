@@ -103,10 +103,19 @@ const routes = [
       },
       {
         path: "expense",
-        name: "AddExpense",
-        component: () => import("@/components/Expense/AddExpense.vue"),
+        name: "ExpenseCreation",
+        component: () => import("@/components/Expense/ExpenseCreation.vue"),
         meta: {
           titleKey: "expense.newExpense",
+          accessLevel: [AccessLevel.CreateExpense],
+        },
+      },
+      {
+        path: "income",
+        name: "IncomeCreation",
+        component: () => import("@/components/Expense/IncomeCreation.vue"),
+        meta: {
+          titleKey: "income.newIncome",
           accessLevel: [AccessLevel.CreateExpense],
         },
       },

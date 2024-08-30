@@ -4,7 +4,7 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import BaseDialog from "../Base/BaseDialog.vue";
 import CloseButton from "../Base/CloseButton.vue";
-import AddExpense from "./AddExpense.vue";
+import ExpenseUpdate from "./ExpenseUpdate.vue";
 
 export interface EditExpenseDialogProps {
   isOpen: boolean;
@@ -20,6 +20,10 @@ const showDialog = computed({
   set: (value) => emit("update:isOpen", value),
 });
 
+const title = computed(() =>
+  props.expense.isIncome ? t("income.editIncome") : t("expense.editExpense")
+);
+
 function onExpenseUpdate() {
   emit("update:expense");
   showDialog.value = false;
@@ -29,17 +33,13 @@ function onExpenseUpdate() {
 <template>
   <BaseDialog
     v-model:isOpen="showDialog"
-    :title="t('expense.editExpense')"
+    :title="title"
     title-icon="mdi-file-edit"
   >
-    <AddExpense
-      :expense="props.expense"
-      confirm-button-label="ui.save"
-      @update:expense="onExpenseUpdate"
-    >
+    <ExpenseUpdate :expense="props.expense" @update:expense="onExpenseUpdate">
       <template #actions>
         <CloseButton @click="showDialog = false" />
       </template>
-    </AddExpense>
+    </ExpenseUpdate>
   </BaseDialog>
 </template>

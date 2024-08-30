@@ -6,6 +6,7 @@ export interface ExpenseData {
   tagIds: string[];
   amount: number;
   date: Date;
+  isIncome: boolean;
 }
 
 export interface Expense extends ExpenseData {
@@ -36,3 +37,11 @@ export interface ExpenseUpdateResponse {
 }
 
 export interface ExpensesFetchResponse extends ExpensesData {}
+
+export interface TransferExpensesResponse {
+  expensesCount: number;
+}
+
+export interface DeleteExpensesBulkResponse {
+  deletedCount: number;
+}

@@ -6,11 +6,13 @@ import {
 } from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallet";
 import { ExpenseEnriched } from "@/types/Expense";
+import { Period } from "@/types/Period";
 import { storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useDate } from "vuetify";
 import { VList } from "vuetify/components";
+import DateSelection from "../Base/DateSelection.vue";
 import DashboardPanel from "../Dashboard/DashboardPanel.vue";
 import ExpenseItem from "./Expense.vue";
 
@@ -29,9 +31,8 @@ const groupedExpenses = computed(() => {
   return groupExpensesByDate(expenses.value, date);
 });
 
-watch(currentWallet, () => {
-  fetchExpenses();
-});
+watch(currentWallet, fetchExpenses);
+watch(selectedDate, fetchExpenses);
 
 fetchExpenses();
 
@@ -56,16 +57,6 @@ async function fetchExpenses() {
   expenses.value = enrichExpenses(expensesData);
 }
 
-function previousMonth() {
-  selectedDate.value = date.addMonths(selectedDate.value, -1) as Date;
-  fetchExpenses();
-}
-
-function nextMonth() {
-  selectedDate.value = date.addMonths(selectedDate.value, 1) as Date;
-  fetchExpenses();
-}
-
 function collapse() {
   selectedDate.value = new Date();
   expanded.value = false;
@@ -82,26 +73,19 @@ function showAllExpenses() {
     <slot />
 
     <div :class="$style.header">
-      {{ t("expense.latestExpenses") }}
+      {{ t("expense.latestTransactions") }}
     </div>
 
     <v-list
       ref="list"
       :class="{ [$style.list]: true, [$style.expanded]: expanded }"
     >
-      <div v-show="expanded" :class="$style.dateSelect">
-        <v-btn
-          icon="mdi-menu-left"
-          variant="text"
-          @click="previousMonth"
-        ></v-btn>
-
-        <v-btn color="primary" width="160" @click="isCalendarOpen = true">
-          {{ date.format(selectedDate, "monthAndYear") }}
-        </v-btn>
-
-        <v-btn icon="mdi-menu-right" variant="text" @click="nextMonth"></v-btn>
-      </div>
+      <DateSelection
+        v-show="expanded"
+        v-model:selected-date="selectedDate"
+        :type="Period.Month"
+        :class="$style.dateSelect"
+      />
 
       <v-dialog v-model="isCalendarOpen">
         <v-date-picker
@@ -146,7 +130,7 @@ function showAllExpenses() {
 
     <div v-show="!expanded && expenses.length" :class="$style.bottomPanel">
       <v-btn variant="text" color="primary" @click="showAllExpenses">
-        {{ t("expense.seeAllExpenses") }}
+        {{ t("expense.seeAll") }}
       </v-btn>
     </div>
   </DashboardPanel>
@@ -155,10 +139,16 @@ function showAllExpenses() {
 <style lang="scss" module>
 .container {
   --latest-expenses-title-height: 40px;
+  --dashboard-button-padding: min(
+    var(--dashboard-button-height),
+    var(--dashboard-padding)
+  );
   --container-height: calc(
-    var(--content-height) - var(--dashboard-padding) * 2 - var(
+    var(--content-height) - var(--dashboard-padding) - var(
         --dashboard-header-height
-      ) - var(--dashboard-button-height) - var(--dashboard-badge-height)
+      ) - var(--dashboard-button-padding) - var(--dashboard-button-height) - var(
+        --dashboard-badge-height
+      )
   );
 
   position: relative;
@@ -174,9 +164,6 @@ function showAllExpenses() {
 }
 
 .dateSelect {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: sticky;
   top: 0;
   z-index: 1;

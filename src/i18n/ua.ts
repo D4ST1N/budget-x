@@ -78,6 +78,7 @@ export default {
     AvatarFetchError: "Не вдалось отримати аватар",
     CategoryAlreadyExists: "Категорія з такою назвою вже існує",
     TagAlreadyExists: "Тег з такою назвою вже існує",
+    ParentCategoryHasExpenses: "Батьківська категорія має витрати",
   },
   home: {
     title: "Інформація про гаманці",
@@ -93,6 +94,8 @@ export default {
     total: "Всього",
     period: "Період",
     graphType: "Тип графіка",
+    dailyIncome: "Денний дохід",
+    monthlyIncome: "Дохід за місяць",
   },
   profile: {
     title: "Профіль",
@@ -151,6 +154,22 @@ export default {
     noCategories: "Ще не додано жодної категорії",
     categoriesTitle: "Категорії",
     category: "Категорія",
+    subCategoryHint:
+      "Ця категорія має підкатегорії, її не можна зробити підкатегорією",
+    parentCategoryHasExpenses: "Батьківська категорія вже має витрати",
+    parentCategoryHasExpensesDescription: "Оберіть що робити з витратами",
+    transferToCurrentCategory:
+      "Перенести витрати в поточну категорію ({categoryName})",
+    transferToAnotherCategory: "Перенести в іншу категорію",
+    transferToNewCategory: "Перенести в нову категорію",
+    newCategoryName: "Назва нової категорії",
+    selectCategory: "Оберіть категорію",
+    categoryHasExpenses: "Категорія має витрати",
+    categoryHasExpensesDescription: "Оберіть що робити з витратами",
+    deleteExpenses: "Видалити витрати",
+    transferToParentCategory:
+      "Перенести в батьківську категорію ({categoryName})",
+    isIncomeCategory: "Це категорія для доходів",
   },
   tag: {
     tags: "Теги",
@@ -170,9 +189,16 @@ export default {
     deleteExpense: "Видалити витрату",
     deleteExpenseText: "Ви впевнені, що хочете видалити витрату?",
     editExpense: "Редагувати витрату",
-    latestExpenses: "Останні витрати",
-    seeAllExpenses: "Переглянути всі витрати",
-    noExpensesThisMonth: "В цьому місяці витрати відсутні",
+    latestTransactions: "Останні транзакції",
+    seeAll: "Переглянути всі",
+    noExpensesThisMonth: "У цьому місяці витрати відсутні",
+    noExpensesThisYear: "У цьому році витрати відсутні",
+  },
+  income: {
+    newIncome: "Нове надходження",
+    editIncome: "Редагувати надходження",
+    deleteIncome: "Видалити надходження",
+    deleteIncomeText: "Ви впевнені, що хочете видалити надходження?",
   },
   users: {
     users: "Користувачі",

@@ -11,6 +11,7 @@ export interface ExpensesFilters {
   categories?: string[];
   tags?: string[];
   limit?: number;
+  isIncome?: boolean;
 }
 
 export async function fetchExpensesAction({

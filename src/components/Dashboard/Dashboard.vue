@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import WalletSettings from "@/components/Wallet/WalletSettings.vue";
+import { hasAccess } from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallet";
+import { AccessLevel } from "@/types/AccessLevel";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -12,7 +14,7 @@ const { t } = useI18n();
 const router = useRouter();
 const walletStore = useWalletStore();
 
-const { categories } = storeToRefs(walletStore);
+const { categories, currentAccessLevel } = storeToRefs(walletStore);
 const categoriesFetched = ref<boolean>(false);
 
 const noCategoriesAdded = computed(() => categories.value.length === 0);
@@ -23,8 +25,16 @@ onMounted(async () => {
   categoriesFetched.value = true;
 });
 
+const addExpenseAllowed = computed(() =>
+  hasAccess([AccessLevel.CreateExpense], currentAccessLevel.value)
+);
+
 function addExpenseClick() {
-  router.push({ name: "AddExpense" });
+  router.push({ name: "ExpenseCreation" });
+}
+
+function addIncomeClick() {
+  router.push({ name: "IncomeCreation" });
 }
 </script>
 
@@ -52,14 +62,24 @@ function addExpenseClick() {
       </v-alert>
     </ExpensesList>
 
-    <DashboardPanel v-ripple :class="$style.expense" @click="addExpenseClick">
+    <DashboardPanel
+      v-if="addExpenseAllowed"
+      v-ripple
+      :class="$style.expense"
+      @click="addExpenseClick"
+    >
       <div :class="$style.tileButton">
         <v-icon size="48">mdi-cash</v-icon>
         <span>{{ t("wallet.addExpense") }}</span>
       </div>
     </DashboardPanel>
 
-    <DashboardPanel v-ripple :class="$style.income">
+    <DashboardPanel
+      v-if="addExpenseAllowed"
+      v-ripple
+      :class="$style.income"
+      @click="addIncomeClick"
+    >
       <div :class="$style.tileButton">
         <v-icon size="48">mdi-piggy-bank</v-icon>
         <span>{{ t("wallet.addIncome") }}</span>
@@ -77,28 +97,23 @@ function addExpenseClick() {
 
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr var(--dashboard-button-height);
+  grid-template-rows: var(--dashboard-header-height) 1fr var(
+      --dashboard-button-height
+    );
   grid-template-areas:
+    "header header"
     "main main"
     "expense income";
   height: 100%;
   padding: var(--dashboard-padding);
   gap: 6px;
 
-  &:has(.header:first-child) {
-    --dashboard-button-height: 100px;
-
-    grid-template-rows: var(--dashboard-header-height) 1fr var(
-        --dashboard-button-height
-      );
-    grid-template-areas:
-      "header header"
-      "main main"
-      "expense income";
-  }
-
   &:has(.badge) {
     --dashboard-badge-height: 100px;
+  }
+
+  &:has(.expense) {
+    --dashboard-button-height: 100px;
   }
 }
 

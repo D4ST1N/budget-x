@@ -68,3 +68,9 @@ export const updateExpenseUrl = (walletId: string, expenseId: string) =>
 
 export const deleteExpenseUrl = (walletId: string, expenseId: string) =>
   `/wallet/${walletId}/expense/${expenseId}`;
+
+export const transferExpensesUrl = (walletId: string) =>
+  `/wallet/${walletId}/expense/transfer`;
+
+export const deleteExpensesBulkUrl = (walletId: string, categoryId: string) =>
+  `/wallet/${walletId}/category/${categoryId}/expense`;

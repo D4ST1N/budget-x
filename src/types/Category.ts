@@ -1,6 +1,7 @@
 export interface CategoryData {
   name: string;
   parentCategory: string | null;
+  isIncomeCategory: boolean;
 }
 
 export interface Category extends CategoryData {

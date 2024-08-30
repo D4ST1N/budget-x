@@ -38,6 +38,18 @@ const deleteAllowed = computed(
     props.deleteAvailable
 );
 
+const deleteTitle = computed(() =>
+  props.expense.expense.isIncome
+    ? t("income.deleteIncome")
+    : t("expense.deleteExpense")
+);
+
+const deleteMessage = computed(() =>
+  props.expense.expense.isIncome
+    ? t("income.deleteIncomeText")
+    : t("expense.deleteExpenseText")
+);
+
 function removeExpense() {
   walletStore.deleteExpense(props.expense.expense._id);
   emit("delete:expense");
@@ -53,8 +65,9 @@ function onExpenseUpdate() {
     :title="n(expense.expense.amount, 'currency')"
     :edit-allowed="editAllowed"
     :delete-allowed="deleteAllowed"
-    :delete-title="t('expense.deleteExpense')"
-    :delete-message="t('expense.deleteExpenseText')"
+    :delete-title="deleteTitle"
+    :delete-message="deleteMessage"
+    :class="{ [$style.income]: props.expense.expense.isIncome }"
     @edit="() => (isExpenseEditDialogOpen = true)"
     @delete="removeExpense"
   >
@@ -89,5 +102,10 @@ function onExpenseUpdate() {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
+}
+
+.income {
+  --item-bg: rgba(var(--v-theme-secondary), 0.25);
+  --sub-item-bg: rgba(var(--v-theme-secondary), 0.15);
 }
 </style>

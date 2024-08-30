@@ -35,7 +35,6 @@ const pickerValue = computed({
         v-model="pickerValue"
         scrollable
         show-current
-        width="360"
         locale="ua"
         :class="$style.datePicker"
         @update:modelValue="showDialog = false"

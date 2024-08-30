@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Expenses from "@/components/Dashboard/Expenses.vue";
+import StatisticChart from "@/components/Statistic/StatisticChart.vue";
 import BaseLayout from "@/layouts/Base.vue";
 </script>
 
 <template>
   <BaseLayout>
-    <Expenses />
+    <StatisticChart />
   </BaseLayout>
 </template>

@@ -19,5 +19,6 @@ export interface TagCreationResponse {
 export interface TagUpdateResponse extends TagCreationResponse {}
 
 export interface TagsCreationResponse {
-  tags: Tag[];
+  createdTags: Tag[];
+  existingTags: Tag[];
 }

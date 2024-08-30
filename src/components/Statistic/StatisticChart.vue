@@ -7,12 +7,17 @@ import {
 } from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallet";
 import { Category } from "@/types/Category";
+import { ChartType, PieOrLine } from "@/types/ChartType";
 import { Expense } from "@/types/Expense";
+import { MonthOrYear, Period } from "@/types/Period";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useDate } from "vuetify";
-import DashboardPanel from "./DashboardPanel.vue";
+import DateSelection from "../Base/DateSelection.vue";
+import DashboardPanel from "../Dashboard/DashboardPanel.vue";
+import ChartTypeSelect from "./ChartTypeSelect.vue";
+import PeriodSelect from "./PeriodSelect.vue";
 
 const { t, n } = useI18n();
 const date = useDate();
@@ -21,23 +26,25 @@ const walletStore = useWalletStore();
 const { currentWallet } = storeToRefs(walletStore);
 const chartContainer = ref<InstanceType<typeof DashboardPanel> | null>(null);
 const containerWidth = ref<number>(360);
+const containerHeight = ref<number>(360);
 const selectedDate = ref(new Date());
-const isCalendarOpen = ref<boolean>(false);
-const chartType = ref<"pie" | "line">("pie");
-const period = ref<"month" | "year">("month");
+const chartType = ref<PieOrLine>(ChartType.Pie);
+const period = ref<MonthOrYear>(Period.Month);
 const periodExpenses = ref<Expense[]>([]);
 const periodCategories = ref<Category[]>([]);
 const chartKey = ref(0);
 
 const totalAmount = computed(() =>
-  periodExpenses.value.reduce((total, expense) => total + expense.amount, 0)
+  periodExpenses.value
+    .filter((e) => !e.isIncome)
+    .reduce((total, expense) => total + expense.amount, 0)
 );
 
 const pieChartData = computed(() => {
   const categoryTotals: Record<string, number> = {};
 
   const enrichedExpenses = enrichExpenses({
-    expenses: periodExpenses.value,
+    expenses: periodExpenses.value.filter((e) => !e.isIncome),
     categories: periodCategories.value,
     tags: [],
   });
@@ -63,15 +70,15 @@ const pieChartData = computed(() => {
   });
 });
 
-const lineChartData = computed(() => {
+const lineChartExpensesData = computed(() => {
   const groupedExpenses = groupExpensesByDate(
     enrichExpenses({
-      expenses: periodExpenses.value,
+      expenses: periodExpenses.value.filter((e) => !e.isIncome),
       categories: periodCategories.value,
       tags: [],
     }),
     date,
-    { order: "asc", sortBy: period.value === "month" ? "day" : "month" }
+    { order: "asc", sortBy: period.value === Period.Month ? "day" : "month" }
   );
 
   return Object.entries(groupedExpenses).map(([date, expenses]) => {
@@ -82,13 +89,48 @@ const lineChartData = computed(() => {
   });
 });
 
+const lineChartIncomesData = computed(() => {
+  const groupedExpenses = groupExpensesByDate(
+    enrichExpenses({
+      expenses: periodExpenses.value.filter((e) => e.isIncome),
+      categories: periodCategories.value,
+      tags: [],
+    }),
+    date,
+    { order: "asc", sortBy: period.value === Period.Month ? "day" : "month" }
+  );
+
+  return Object.entries(groupedExpenses).map(([date, expenses]) => {
+    return {
+      name: date,
+      y: expenses.reduce((total, expense) => total + expense.expense.amount, 0),
+    };
+  });
+});
+
+const lineChartSeries = computed(() => {
+  const series = [
+    {
+      name: graphTypeLineCaption.value,
+      data: lineChartExpensesData.value,
+      color: "rgb(var(--v-theme-primary))",
+    },
+    {
+      name: graphTypeLineIncomeCaption.value,
+      data: lineChartIncomesData.value,
+      color: "rgb(var(--v-theme-secondary))",
+    },
+  ];
+  return period.value === Period.Month ? [series[0]] : series;
+});
+
 const pieChartOptions = computed(() => {
   return {
     chart: {
       type: "pie",
       backgroundColor: "transparent",
       width: containerWidth.value,
-      height: containerWidth.value - 40,
+      height: containerHeight.value,
       marginTop: -100,
     },
     title: {
@@ -127,7 +169,7 @@ const lineChartOptions = computed(() => {
       type: "line",
       backgroundColor: "transparent",
       width: containerWidth.value,
-      height: containerWidth.value - 40,
+      height: containerHeight.value,
       marginTop: 30,
     },
     title: {
@@ -156,16 +198,10 @@ const lineChartOptions = computed(() => {
     },
     legend: {
       itemStyle: {
-        color: "rgb(var(--v-theme-primary))", // Колір підпису серії
+        color: "rgb(var(--v-theme-primary))",
       },
     },
-    series: [
-      {
-        name: graphTypeLineCaption.value,
-        data: lineChartData.value,
-        color: "rgb(var(--v-theme-primary))", // Колір лінії
-      },
-    ],
+    series: lineChartSeries.value,
     tooltip: {
       backgroundColor: "rgba(0, 0, 0, 0.7)",
       style: {
@@ -176,7 +212,7 @@ const lineChartOptions = computed(() => {
 });
 
 const chartOptions = computed(() => {
-  if (chartType.value === "pie") {
+  if (chartType.value === ChartType.Pie) {
     return pieChartOptions.value;
   } else {
     return lineChartOptions.value;
@@ -184,46 +220,56 @@ const chartOptions = computed(() => {
 });
 
 const graphTypeLineLabel = computed(() => {
-  return period.value === "month"
+  return period.value === Period.Month
     ? t("statistic.byDay")
     : t("statistic.byMonth");
 });
 
 const graphTypeLineCaption = computed(() => {
-  return period.value === "month"
+  return period.value === Period.Month
     ? t("statistic.dailyExpenses")
     : t("statistic.monthlyExpenses");
 });
 
+const graphTypeLineIncomeCaption = computed(() => {
+  return period.value === Period.Month
+    ? t("statistic.dailyIncome")
+    : t("statistic.monthlyIncome");
+});
+
+const noExpensesText = computed(() => {
+  return period.value === Period.Month
+    ? t("expense.noExpensesThisMonth")
+    : t("expense.noExpensesThisYear");
+});
+
 onMounted(() => {
-  if (chartContainer.value) {
-    containerWidth.value = Math.min(
-      chartContainer.value.$el.clientWidth,
-      chartContainer.value.$el.clientHeight
-    );
-    getData();
-  }
+  updateContainerSize();
+
+  getData();
 });
 
 watch(chartOptions, () => {
   chartKey.value += 1;
+  updateContainerSize();
 });
 
 watch(period, getData);
 
 watch(currentWallet, getData);
 
-function selectMonth(month: number) {
-  isCalendarOpen.value = false;
-  selectedDate.value = date.setMonth(selectedDate.value, month) as Date;
-  getData();
+function updateContainerSize() {
+  if (chartContainer.value) {
+    containerWidth.value = chartContainer.value.$el.clientWidth;
+    containerHeight.value = chartContainer.value.$el.clientHeight - 190;
+  }
 }
 
 async function getData() {
   let startDate: string;
   let endDate: string;
 
-  if (period.value === "month") {
+  if (period.value === Period.Month) {
     startDate = formatDate(
       date.startOfMonth(selectedDate.value) as string,
       "YYYY-MM-DD"
@@ -265,64 +311,22 @@ async function getData() {
 
     <div :class="$style.header">
       <div :class="$style.switchersContainer">
-        <div :class="$style.switcherWrapper">
-          <div class="text-primary" :class="$style.switcherLabel">
-            {{ t("statistic.graphType") }}
-          </div>
+        <ChartTypeSelect
+          v-model:selected-type="chartType"
+          :line-chart-text="graphTypeLineLabel"
+        />
 
-          <v-btn-toggle
-            v-model="chartType"
-            mandatory
-            size="x-small"
-            density="compact"
-          >
-            <v-btn size="x-small" value="pie">
-              {{ t("statistic.byCategory") }}
-            </v-btn>
-            <v-btn size="x-small" value="line">
-              {{ graphTypeLineLabel }}
-            </v-btn>
-          </v-btn-toggle>
-        </div>
-
-        <div :class="$style.switcherWrapper">
-          <div class="text-primary" :class="$style.switcherLabel">
-            {{ t("statistic.period") }}
-          </div>
-
-          <v-btn-toggle
-            v-model="period"
-            mandatory
-            size="x-small"
-            density="compact"
-          >
-            <v-btn size="x-small" value="month">{{ t("unit.month") }}</v-btn>
-            <v-btn size="x-small" value="year">{{ t("unit.year") }}</v-btn>
-          </v-btn-toggle>
-        </div>
+        <PeriodSelect v-model:selected-period="period" />
       </div>
 
       <div :class="$style.title">
-        <span>{{ t("statistic.monthExpenses") }}</span>
-
-        <v-btn variant="text" @click="isCalendarOpen = true">
-          {{ date.format(selectedDate, "monthAndYear") }}
-
-          <template #append>
-            <v-icon>mdi-menu-down</v-icon>
-          </template>
-        </v-btn>
+        <DateSelection
+          v-model:selectedDate="selectedDate"
+          :type="period"
+          @update:selected-date="getData"
+        />
       </div>
     </div>
-
-    <v-dialog v-model="isCalendarOpen">
-      <v-date-picker
-        v-model="selectedDate"
-        type="months"
-        view-mode="months"
-        @update:month="selectMonth"
-      />
-    </v-dialog>
 
     <highcharts
       v-if="periodExpenses.length"
@@ -331,7 +335,7 @@ async function getData() {
       :class="$style.chart"
     ></highcharts>
     <div v-else :class="$style.noData">
-      {{ t("expense.noExpensesThisMonth") }}
+      {{ noExpensesText }}
     </div>
 
     <div :class="$style.total">
@@ -353,7 +357,7 @@ async function getData() {
 }
 
 .title {
-  padding: 6px 12px;
+  padding-top: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -367,7 +371,6 @@ async function getData() {
 }
 
 .chart {
-  margin-top: 12px;
   flex-grow: 1;
 }
 
@@ -381,7 +384,6 @@ async function getData() {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   flex-direction: column;
   width: 100%;
   padding: 8px 0;

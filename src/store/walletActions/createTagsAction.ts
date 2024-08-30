@@ -2,7 +2,7 @@ import { handleServerError } from "@/helpers/handleServerError";
 import { addTagsBulkUrl } from "@/helpers/serverUrls";
 import { api } from "@/plugins/axios";
 import { ServerResponseError } from "@/types/ServerResponse";
-import { TagData, TagsCreationResponse } from "@/types/Tag";
+import { TagsCreationResponse } from "@/types/Tag";
 import { AxiosResponse } from "axios";
 
 export async function createTagsAction({
@@ -10,7 +10,7 @@ export async function createTagsAction({
   tags,
 }: {
   walletId: string;
-  tags: TagData[];
+  tags: string[];
 }): Promise<TagsCreationResponse | null> {
   try {
     const response: AxiosResponse<TagsCreationResponse> = await api.post(

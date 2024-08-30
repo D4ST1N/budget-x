@@ -1,6 +1,7 @@
 import { handleServerError } from "@/helpers/handleServerError";
 import { deleteCategoryUrl } from "@/helpers/serverUrls";
 import { api } from "@/plugins/axios";
+import { ErrorType } from "@/types/ErrorType";
 import { ServerResponseError } from "@/types/ServerResponse";
 import { AxiosResponse } from "axios";
 
@@ -18,7 +19,7 @@ export async function deleteCategoryAction({
 
     return response.data.success;
   } catch (error: ServerResponseError | any) {
-    handleServerError(error);
+    handleServerError(error, [ErrorType.CategoryHasExpenses]);
 
     return false;
   }

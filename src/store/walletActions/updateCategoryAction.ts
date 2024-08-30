@@ -2,6 +2,7 @@ import { handleServerError } from "@/helpers/handleServerError";
 import { updateCategoryUrl } from "@/helpers/serverUrls";
 import { api } from "@/plugins/axios";
 import { CategoryData, CategoryUpdateResponse } from "@/types/Category";
+import { ErrorType } from "@/types/ErrorType";
 import { ServerResponseError } from "@/types/ServerResponse";
 import { AxiosResponse } from "axios";
 
@@ -22,7 +23,7 @@ export async function updateCategoryAction({
 
     return response.data;
   } catch (error: ServerResponseError | any) {
-    handleServerError(error);
+    handleServerError(error, [ErrorType.ParentCategoryHasExpenses]);
 
     return null;
   }

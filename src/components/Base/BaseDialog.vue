@@ -4,7 +4,7 @@ import { computed } from "vue";
 interface DialogProps {
   isOpen: boolean;
   title: string;
-  titleIcon: string;
+  titleIcon?: string;
 }
 
 const props = defineProps<DialogProps>();
@@ -18,11 +18,13 @@ const showDialog = computed({
 
 <template>
   <v-dialog v-model="showDialog" width="400" :class="$style.dialog">
-    <v-card
-      max-width="400"
-      :prepend-icon="props.titleIcon"
-      :title="props.title"
-    >
+    <v-card max-width="400" :prepend-icon="props.titleIcon">
+      <template #title>
+        <v-card-title :class="$style.multiLineTitle">
+          {{ props.title }}
+        </v-card-title>
+      </template>
+
       <template #default>
         <slot />
       </template>
@@ -39,6 +41,16 @@ const showDialog = computed({
 <style lang="scss" module>
 .dialog {
   align-items: flex-start;
+
+  :global(.v-card-item) {
+    padding: 16px !important;
+  }
+}
+
+.multiLineTitle {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .actions {

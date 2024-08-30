@@ -231,16 +231,16 @@ export const useWalletStore = defineStore(
     }
 
     async function createCategory(categoryData: CategoryData) {
-      if (!selectedWallet.value) return false;
+      if (!selectedWallet.value) return null;
 
       const createdCategoryData = await createCategoryAction({
         walletId: selectedWallet.value,
         categoryData,
       });
 
-      if (!createdCategoryData) return false;
+      if (!createdCategoryData) return null;
 
-      fetchCategories();
+      await fetchCategories();
       notificationStore.add({
         text: i18n.global.t("notification.categoryAdded", {
           categoryName: createdCategoryData.category.name,
@@ -248,7 +248,7 @@ export const useWalletStore = defineStore(
         type: NotificationType.Success,
       });
 
-      return true;
+      return createdCategoryData;
     }
 
     async function updateCategory(
@@ -265,7 +265,7 @@ export const useWalletStore = defineStore(
 
       if (!updatedCategoryData) return false;
 
-      fetchCategories();
+      await fetchCategories();
       notificationStore.add({
         text: i18n.global.t("notification.categoryUpdated", {
           categoryName: updatedCategoryData.category.name,
@@ -286,7 +286,7 @@ export const useWalletStore = defineStore(
 
       if (!result) return false;
 
-      fetchCategories();
+      await fetchCategories();
       notificationStore.add({
         text: i18n.global.t("notification.categoryDeleted"),
         type: NotificationType.Success,
@@ -305,7 +305,7 @@ export const useWalletStore = defineStore(
 
       if (!createdTagData) return false;
 
-      fetchWalletTags();
+      await fetchWalletTags();
       notificationStore.add({
         text: i18n.global.t("notification.tagAdded", {
           tagName: createdTagData.tag.name,
@@ -316,23 +316,30 @@ export const useWalletStore = defineStore(
       return true;
     }
 
-    async function createTags(tagsData: TagData[]) {
-      if (!selectedWallet.value) return false;
+    async function createTags(tagNames: string[]) {
+      if (!selectedWallet.value) return null;
+
+      const existingTags = tags.value.filter((tag) =>
+        tagNames.includes(tag.name)
+      );
+
+      if (existingTags.length === tagNames.length) {
+        return existingTags;
+      }
 
       const createdTagsData = await createTagsAction({
         walletId: selectedWallet.value,
-        tags: tagsData,
+        tags: tagNames,
       });
 
       if (!createdTagsData) return null;
 
-      fetchWalletTags();
       notificationStore.add({
         text: i18n.global.t("notification.tagsAdded"),
         type: NotificationType.Success,
       });
 
-      return createdTagsData.tags;
+      return [...createdTagsData.createdTags, ...createdTagsData.existingTags];
     }
 
     async function updateTag(tagData: TagData, tagId: string) {
@@ -346,7 +353,7 @@ export const useWalletStore = defineStore(
 
       if (!updatedTagData) return false;
 
-      fetchWalletTags();
+      await fetchWalletTags();
       notificationStore.add({
         text: i18n.global.t("notification.tagUpdated", {
           tagName: updatedTagData.tag.name,
@@ -367,7 +374,7 @@ export const useWalletStore = defineStore(
 
       if (!successDeletion) return false;
 
-      fetchWalletTags();
+      await fetchWalletTags();
       notificationStore.add({
         text: i18n.global.t("notification.tagDeleted"),
         type: NotificationType.Success,
@@ -403,7 +410,7 @@ export const useWalletStore = defineStore(
       if (!deleteResult) return;
 
       selectedWallet.value = null;
-      fetchWallets();
+      await fetchWallets();
       router.push({ name: "Home" });
       notificationStore.add({
         text: i18n.global.t("notification.walletDeleted"),
@@ -462,7 +469,7 @@ export const useWalletStore = defineStore(
 
       if (!updateSuccess) return;
 
-      fetchWallets();
+      await fetchWallets();
       notificationStore.add({
         text: i18n.global.t(`notification.userEdited`),
         type: NotificationType.Success,

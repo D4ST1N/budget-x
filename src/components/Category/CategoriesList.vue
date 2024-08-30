@@ -18,7 +18,7 @@ function openAddCategoryDialog() {
 </script>
 
 <template>
-  <v-card>
+  <v-card :class="$style.card">
     <v-card-text>
       <v-btn
         color="secondary"
@@ -54,12 +54,16 @@ function openAddCategoryDialog() {
 </template>
 
 <style lang="scss" module>
+.card {
+  --button-block-height: 68px;
+}
+
 .list {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 6px 12px;
-  max-height: calc(100vh - var(--v-layout-top) - 32px - 68px);
+  max-height: calc(var(--content-height) - var(--button-block-height));
 
   :global(.v-list-group__items) {
     display: flex;
