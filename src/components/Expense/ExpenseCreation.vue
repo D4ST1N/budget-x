@@ -8,7 +8,7 @@ const emit = defineEmits(["update:expense"]);
 const walletStore = useWalletStore();
 
 async function createExpense(formPayload: SubmitExpenseEditFormPayload) {
-  const tags = await walletStore.createTags(formPayload.tags);
+  const tags = await walletStore.createTags(formPayload.tagNames);
 
   if (!tags) {
     return;
@@ -22,6 +22,28 @@ async function createExpense(formPayload: SubmitExpenseEditFormPayload) {
     isIncome: false,
   });
 }
+
+async function createMultipleExpenses(parts: SubmitExpenseEditFormPayload[]) {
+  const tags = await walletStore.createTags(
+    parts.reduce((acc, part) => acc.concat(part.tagNames), [] as string[])
+  );
+
+  if (!tags) {
+    return;
+  }
+
+  await walletStore.createExpensesBulk(
+    parts.map((part) => ({
+      categoryId: part.categoryId,
+      tagIds: part.tagNames.map(
+        (tagName) => tags.find((tag) => tag.name === tagName)!._id
+      ),
+      amount: part.amount,
+      date: part.date,
+      isIncome: false,
+    }))
+  );
+}
 </script>
 
 <template>
@@ -31,6 +53,7 @@ async function createExpense(formPayload: SubmitExpenseEditFormPayload) {
       :expense="{}"
       confirmButtonLabel="ui.add"
       @submit:form="createExpense"
+      @submit:form-multiple="createMultipleExpenses"
     >
       <template #actions>
         <slot name="actions" />

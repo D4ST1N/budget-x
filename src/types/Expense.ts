@@ -9,6 +9,13 @@ export interface ExpenseData {
   isIncome: boolean;
 }
 
+export type ExpenseEditData = Pick<
+  ExpenseData,
+  "categoryId" | "amount" | "date"
+> & {
+  tagNames: string[];
+};
+
 export interface Expense extends ExpenseData {
   walletId: string;
   _id: string;
@@ -30,6 +37,10 @@ export interface ExpensesData {
 
 export interface ExpenseCreationResponse {
   expense: Expense;
+}
+
+export interface ExpensesCreationResponse {
+  expenses: Expense[];
 }
 
 export interface ExpenseUpdateResponse {

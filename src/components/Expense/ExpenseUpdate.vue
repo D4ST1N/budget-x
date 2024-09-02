@@ -14,7 +14,7 @@ const props = defineProps<AddExpenseProps>();
 const walletStore = useWalletStore();
 
 async function updateExpense(formPayload: SubmitExpenseEditFormPayload) {
-  const tags = await walletStore.createTags(formPayload.tags);
+  const tags = await walletStore.createTags(formPayload.tagNames);
 
   if (!tags) {
     return;

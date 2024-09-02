@@ -5,14 +5,16 @@ import { md2 } from "vuetify/blueprints";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import { aliases, mdi } from "vuetify/iconsets/mdi";
+import { VNumberInput } from "vuetify/labs/VNumberInput";
 import { createVueI18nAdapter } from "vuetify/locale/adapters/vue-i18n";
 import "vuetify/styles";
 import i18n from "./i18n";
-import "vuetify/styles";
-import "vuetify/styles";
 
 const vuetify = createVuetify({
-  components,
+  components: {
+    VNumberInput,
+    ...components,
+  },
   directives,
   blueprint: md2,
   icons: {

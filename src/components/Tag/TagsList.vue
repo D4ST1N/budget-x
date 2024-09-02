@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { hasAccess } from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallet";
+import { AccessLevel } from "@/types/AccessLevel";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import AddTagDialog from "./AddTagDialog.vue";
 import Tag from "./Tag.vue";
@@ -9,8 +11,12 @@ import Tag from "./Tag.vue";
 const { t } = useI18n();
 const walletStore = useWalletStore();
 
-const { tags } = storeToRefs(walletStore);
+const { tags, currentAccessLevel } = storeToRefs(walletStore);
 const isAddTagDialogOpen = ref<boolean>(false);
+
+const addTagAllowed = computed(() => {
+  return hasAccess([AccessLevel.CreateTag], currentAccessLevel.value);
+});
 
 function openAddTagDialog() {
   isAddTagDialogOpen.value = true;
@@ -18,8 +24,13 @@ function openAddTagDialog() {
 </script>
 
 <template>
-  <v-card>
-    <v-card-text>
+  <v-card
+    :class="{
+      [$style.card]: true,
+      [$style.createDisabled]: !addTagAllowed,
+    }"
+  >
+    <v-card-text v-if="addTagAllowed">
       <v-btn color="secondary" variant="elevated" @click="openAddTagDialog">
         <template #prepend>
           <v-icon>mdi-expand-all</v-icon>
@@ -38,11 +49,19 @@ function openAddTagDialog() {
 </template>
 
 <style lang="scss" module>
+.card {
+  --button-block-height: 68px;
+
+  &.createDisabled {
+    --button-block-height: 0px;
+  }
+}
+
 .list {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 6px 12px;
-  max-height: calc(100vh - var(--v-layout-top) - 32px - 68px);
+  max-height: calc(var(--content-height) - var(--button-block-height));
 }
 </style>

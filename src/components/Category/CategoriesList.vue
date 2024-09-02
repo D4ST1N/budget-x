@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { hasAccess } from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallet";
+import { AccessLevel } from "@/types/AccessLevel";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import AddCategoryDialog from "./AddCategoryDialog.vue";
 import Category from "./Category.vue";
@@ -9,8 +11,12 @@ import Category from "./Category.vue";
 const { t } = useI18n();
 const walletStore = useWalletStore();
 
-const { categoriesTree } = storeToRefs(walletStore);
+const { categoriesTree, currentAccessLevel } = storeToRefs(walletStore);
 const isAddCategoryDialogOpen = ref<boolean>(false);
+
+const addCategoryAllowed = computed(() => {
+  return hasAccess([AccessLevel.CreateCategory], currentAccessLevel.value);
+});
 
 function openAddCategoryDialog() {
   isAddCategoryDialogOpen.value = true;
@@ -18,8 +24,13 @@ function openAddCategoryDialog() {
 </script>
 
 <template>
-  <v-card :class="$style.card">
-    <v-card-text>
+  <v-card
+    :class="{
+      [$style.card]: true,
+      [$style.createDisabled]: !addCategoryAllowed,
+    }"
+  >
+    <v-card-text v-if="addCategoryAllowed">
       <v-btn
         color="secondary"
         variant="elevated"
@@ -56,6 +67,10 @@ function openAddCategoryDialog() {
 <style lang="scss" module>
 .card {
   --button-block-height: 68px;
+
+  &.createDisabled {
+    --button-block-height: 0px;
+  }
 }
 
 .list {

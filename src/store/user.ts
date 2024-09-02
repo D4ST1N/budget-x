@@ -1,23 +1,17 @@
-import { verificationInterval } from "@/config/constants";
 import { fetchUserAvatar } from "@/helpers/utils";
 import stytch from "@/plugins/stytch";
 import { OAuthProviders, Products, User } from "@stytch/vanilla-js";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
-import { verifyUserAction } from "./userActions/verifyUserAction";
+import { fetchUserDataAction } from "./userActions/fetchUserDataAction";
 
 const REDIRECT_URL = `${import.meta.env.VITE_SERVER_URL}/auth`;
 
 export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null);
-  const lastVerificationTime = ref<number | null>(null);
 
-  const isVerificationNeeded = computed(() => {
-    if (!lastVerificationTime.value) return true;
-
-    return Date.now() - lastVerificationTime.value > verificationInterval;
-  });
+  getUserData();
 
   function loginUser(elementId: string) {
     stytch.mountLogin({
@@ -41,8 +35,8 @@ export const useUserStore = defineStore("user", () => {
     });
   }
 
-  async function verifyUser(token: string): Promise<boolean> {
-    const userData = await verifyUserAction({ token });
+  async function getUserData(): Promise<boolean> {
+    const userData = await fetchUserDataAction();
 
     if (!userData) return false;
 
@@ -50,15 +44,13 @@ export const useUserStore = defineStore("user", () => {
     user.value.providers[0].profile_picture_url = (await fetchUserAvatar(
       user.value
     )) as string;
-    lastVerificationTime.value = Date.now();
 
     return true;
   }
 
   return {
     user,
-    isVerificationNeeded,
     loginUser,
-    verifyUser,
+    getUserData,
   };
 });

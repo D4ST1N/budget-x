@@ -52,7 +52,7 @@ function scrollToActiveItem() {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  padding: 16px 0;
+  padding: 16px;
 }
 
 .item {

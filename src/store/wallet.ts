@@ -38,6 +38,7 @@ import {
   updateWalletAction,
   updateWalletUserAction,
 } from "./walletActions";
+import { createExpensesBulkAction } from "./walletActions/createExpensesBulkAction";
 
 export const useWalletStore = defineStore(
   "wallets",
@@ -119,6 +120,10 @@ export const useWalletStore = defineStore(
       return rootCategories;
     });
 
+    function categoryById(categoryId: string): Category | undefined {
+      return categories.value.find((category) => category._id === categoryId);
+    }
+
     function selectWallet(walletId: string) {
       if (!allWallets.value.some((wallet) => wallet._id === walletId)) return;
 
@@ -153,12 +158,12 @@ export const useWalletStore = defineStore(
       });
     }
 
-    async function fetchWallets() {
-      if (!user.value) return;
+    function setWallets(walletsData: Wallet[]) {
+      wallets.value = walletsData;
+    }
 
-      const walletsData = await fetchWalletsAction({
-        userId: user.value!.user_id,
-      });
+    async function fetchWallets() {
+      const walletsData = await fetchWalletsAction();
 
       if (!walletsData) return;
 
@@ -523,6 +528,22 @@ export const useWalletStore = defineStore(
       });
     }
 
+    async function createExpensesBulk(expenses: ExpenseData[]) {
+      if (!selectedWallet.value) return;
+
+      const createdExpensesData = await createExpensesBulkAction({
+        walletId: selectedWallet.value,
+        expenses,
+      });
+
+      if (!createdExpensesData) return;
+
+      notificationStore.add({
+        text: i18n.global.t("notification.expensesAdded"),
+        type: NotificationType.Success,
+      });
+    }
+
     async function fetchExpenses(
       filters: ExpensesFilters = {}
     ): Promise<ExpensesData | null> {
@@ -589,9 +610,11 @@ export const useWalletStore = defineStore(
       categoriesTree,
       tags,
       isSharedWallet,
+      categoryById,
       selectWallet,
       waitForAccessLevelsLoaded,
       waitForCategoriesLoaded,
+      setWallets,
       fetchWallets,
       fetchCategories,
       fetchWalletTags,
@@ -611,6 +634,7 @@ export const useWalletStore = defineStore(
       deleteWalletUser,
       getUserAccess,
       createExpense,
+      createExpensesBulk,
       fetchExpenses,
       updateExpense,
       deleteExpense,

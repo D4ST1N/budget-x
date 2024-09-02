@@ -1,18 +1,24 @@
 <script setup lang="ts">
 import { required } from "@/helpers/inputValidations";
+import { limitDecimals } from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallet";
-import { Expense } from "@/types/Expense";
+import { Expense, ExpenseEditData } from "@/types/Expense";
 import { storeToRefs } from "pinia";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { VForm } from "vuetify/components";
 import ActionsWrapper from "../Base/ActionsWrapper.vue";
 import DateSelection from "../Base/DateSelection.vue";
 import CategorySelect from "../Category/CategorySelect.vue";
+import TagSelect from "../Tag/TagSelect.vue";
+import SplitExpense from "./SplitExpense.vue";
 
 export type CategoryEditFormProps = {
   confirmButtonLabel: string;
   isIncome?: boolean;
+  splitExpense?: boolean;
+  showDate?: boolean;
+  maxAmount?: number;
 } & (
   | {
       type: "create";
@@ -25,7 +31,7 @@ export type CategoryEditFormProps = {
 
 export type SubmitExpenseEditFormPayload = {
   categoryId: string;
-  tags: string[];
+  tagNames: string[];
   amount: number;
   date: Date;
 };
@@ -38,8 +44,10 @@ export type ExpenseEditFormEmits = {
 // Haven't found a way to fix this warning so far
 const props = withDefaults(defineProps<CategoryEditFormProps>(), {
   isIncome: false,
+  splitExpense: true,
+  showDate: true,
 });
-const emit = defineEmits(["submit:form"]);
+const emit = defineEmits(["submit:form", "submit:form-multiple"]);
 const { t } = useI18n();
 const walletStore = useWalletStore();
 
@@ -49,6 +57,7 @@ const selectedCategory = ref<string>("");
 const selectedTags = ref<string[]>([]);
 const amount = ref<number | undefined>();
 const valid = ref<boolean>(false);
+const parts = ref<ExpenseEditData[]>([]);
 const requiredField = required();
 
 if (props.type === "edit") {
@@ -62,26 +71,68 @@ if (props.type === "edit") {
   selectedDate.value = new Date(props.expense.date);
 }
 
-const tagsOptions = computed(() => tags.value.map((tag) => tag._id));
+const amountHint = computed(() => {
+  return props.maxAmount
+    ? t("expense.minMaxAmountHint", { max: props.maxAmount, min: 1 })
+    : t("expense.minAmountHint", { min: 1 });
+});
+
+const expenseEditData = computed(() => {
+  return {
+    categoryId: selectedCategory.value,
+    tagNames: selectedTags.value,
+    amount: amount.value!,
+    date: selectedDate.value,
+  };
+});
+
+watch(amount, (value: number | undefined) => {
+  if (value === undefined) {
+    return;
+  }
+
+  amount.value = limitDecimals(value, 2);
+});
 
 function submitForm() {
-  emit("submit:form", {
-    categoryId: selectedCategory.value,
-    tags: selectedTags.value,
-    amount: amount.value,
-    date: selectedDate.value,
-  });
+  if (parts.value.length) {
+    emit("submit:form-multiple", parts.value);
+  } else {
+    emit("submit:form", expenseEditData.value);
+  }
 
   if (props.type === "create") {
     selectedTags.value = [];
     amount.value = undefined;
+    parts.value = [];
   }
 }
 </script>
 
 <template>
-  <v-form v-model="valid" @submit.prevent="submitForm">
-    <DateSelection v-model:selected-date="selectedDate" />
+  <v-form v-model="valid" :class="$style.form" @submit.prevent="submitForm">
+    <DateSelection v-if="props.showDate" v-model:selected-date="selectedDate" />
+
+    <v-number-input
+      v-model="amount"
+      :label="t('expense.amount')"
+      type="number"
+      :min="1"
+      :max="props.maxAmount"
+      inset
+      :rules="[requiredField]"
+      :hint="amountHint"
+      persistent-hint
+      append-inner-icon="mdi-currency-uah"
+    >
+      <template #increment>
+        <span></span>
+      </template>
+
+      <template #decrement>
+        <span></span>
+      </template>
+    </v-number-input>
 
     <CategorySelect
       v-model:selectedCategory="selectedCategory"
@@ -89,26 +140,14 @@ function submitForm() {
       :validations="[requiredField]"
     />
 
-    <v-combobox
-      v-model="selectedTags"
-      :items="tagsOptions"
-      :label="t('tag.tags')"
-      :rules="[requiredField]"
-      item-title="text"
-      item-value="value"
-      chips
-      closable-chips
-      multiple
-      :class="$style.tagSelect"
-    ></v-combobox>
+    <TagSelect v-model:tags="selectedTags" />
 
-    <v-text-field
-      v-model="amount"
-      :label="t('expense.amount')"
-      type="number"
-      :rules="[requiredField]"
-      append-inner-icon="mdi-currency-uah"
-    ></v-text-field>
+    <SplitExpense
+      v-if="props.splitExpense && !props.isIncome"
+      v-model:parts="parts"
+      :expense="expenseEditData"
+      :disabled="!amount || !selectedCategory"
+    />
 
     <v-divider></v-divider>
     <br />
@@ -129,9 +168,9 @@ function submitForm() {
 </template>
 
 <style lang="scss" module>
-.tagSelect {
-  :global(.v-chip__close) {
-    background-color: transparent;
-  }
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 </style>

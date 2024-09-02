@@ -103,6 +103,8 @@ const checkboxHint = computed(() => {
 watch(isSubCategory, (value) => {
   if (value) {
     selectFirstCategory();
+  } else {
+    selectedCategory.value = "";
   }
 });
 watch(isIncomeCategory, () => {

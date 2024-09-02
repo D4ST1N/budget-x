@@ -1,14 +1,13 @@
 <script setup lang="ts">
+import { logoutUrl } from "@/helpers/serverUrls";
 import UserProfileLayout from "@/layouts/UserProfile.vue";
+import { auth } from "@/plugins/axios";
 import { useI18n } from "vue-i18n";
-import { useRouter } from "vue-router";
 
 const { t } = useI18n();
-const router = useRouter();
 
-function logoutClick() {
-  sessionStorage.removeItem("session_token");
-  router.push({ name: "Login" });
+async function logoutClick() {
+  await auth.get(logoutUrl());
 }
 </script>
 

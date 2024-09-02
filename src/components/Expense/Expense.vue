@@ -50,8 +50,8 @@ const deleteMessage = computed(() =>
     : t("expense.deleteExpenseText")
 );
 
-function removeExpense() {
-  walletStore.deleteExpense(props.expense.expense._id);
+async function removeExpense() {
+  await walletStore.deleteExpense(props.expense.expense._id);
   emit("delete:expense");
 }
 
@@ -72,11 +72,10 @@ function onExpenseUpdate() {
     @delete="removeExpense"
   >
     <template #default>
-      <div :class="$style.chips">
-        <v-chip density="comfortable" size="x-small" variant="flat">
-          {{ expense.category.name }}
-        </v-chip>
-
+      <v-list-item-subtitle>
+        {{ expense.category.name }}
+      </v-list-item-subtitle>
+      <div v-if="expense.tags.length" :class="$style.chips">
         <v-chip
           v-for="tag in expense.tags"
           :key="tag._id"
@@ -102,6 +101,7 @@ function onExpenseUpdate() {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
+  margin-top: 6px;
 }
 
 .income {

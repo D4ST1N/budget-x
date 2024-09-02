@@ -97,6 +97,7 @@ function filterResults(
     item-title="text"
     item-value="value"
     clearable
+    hide-details="auto"
   >
     <template #item="{ item, props }">
       <v-list-item v-bind="props" :title="''">

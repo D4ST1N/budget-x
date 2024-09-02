@@ -48,6 +48,5 @@ function selectYear(year: number) {
 .list {
   max-height: 300px;
   overflow-y: auto;
-  padding: 16px;
 }
 </style>

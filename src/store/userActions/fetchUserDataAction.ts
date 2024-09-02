@@ -1,20 +1,14 @@
 import { handleServerError } from "@/helpers/handleServerError";
-import { verifyTokenUrl } from "@/helpers/serverUrls";
+import { getUserDataUrl } from "@/helpers/serverUrls";
 import { auth } from "@/plugins/axios";
 import { ServerResponseError } from "@/types/ServerResponse";
 import { UserVerificationResponse } from "@/types/User";
 import { AxiosResponse } from "axios";
 
-export async function verifyUserAction({
-  token,
-}: {
-  token: string;
-}): Promise<UserVerificationResponse | null> {
+export async function fetchUserDataAction(): Promise<UserVerificationResponse | null> {
   try {
-    const response: AxiosResponse<UserVerificationResponse> = await auth.post(
-      verifyTokenUrl(),
-      { token }
-    );
+    const response: AxiosResponse<UserVerificationResponse> =
+      await auth.get(getUserDataUrl());
 
     return response.data;
   } catch (error: ServerResponseError | any) {

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {
   enrichExpenses,
-  formatDate,
   generateColorFromHash,
   groupExpensesByDate,
+  monthRange,
+  yearRange,
 } from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallet";
 import { Category } from "@/types/Category";
@@ -266,30 +267,11 @@ function updateContainerSize() {
 }
 
 async function getData() {
-  let startDate: string;
-  let endDate: string;
-
-  if (period.value === Period.Month) {
-    startDate = formatDate(
-      date.startOfMonth(selectedDate.value) as string,
-      "YYYY-MM-DD"
-    );
-    endDate = formatDate(
-      date.endOfMonth(selectedDate.value) as string,
-      "YYYY-MM-DD"
-    );
-  } else {
-    startDate = formatDate(
-      date.startOfYear(selectedDate.value) as string,
-      "YYYY-MM-DD"
-    );
-    endDate = formatDate(
-      date.endOfYear(selectedDate.value) as string,
-      "YYYY-MM-DD"
-    );
-  }
-
-  const expensesData = await walletStore.fetchExpenses({ startDate, endDate });
+  const expensesData = await walletStore.fetchExpenses(
+    period.value === Period.Month
+      ? monthRange(selectedDate.value, date)
+      : yearRange(selectedDate.value, date)
+  );
 
   if (!expensesData) {
     periodExpenses.value = [];

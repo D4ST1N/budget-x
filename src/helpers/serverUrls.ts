@@ -1,11 +1,15 @@
 export const verifyTokenUrl = () => "/verify";
 
+export const getUserDataUrl = () => "/user";
+
+export const logoutUrl = () => "/logout";
+
 export const getUserAvatarUrl = () => "/avatar";
 
 export const getUsersUrl = (token: string) => `/users?token=${token}`;
 
-export const getWalletsUrl = (userId: string) => {
-  return `/wallet/by-user/${userId}`;
+export const getWalletsUrl = () => {
+  return `/wallet`;
 };
 
 export const addWalletUrl = () => "/wallet";
@@ -62,6 +66,9 @@ export const getExpensesUrl = (walletId: string) =>
 
 export const addExpenseUrl = (walletId: string) =>
   `/wallet/${walletId}/expense`;
+
+export const addExpensesBulkUrl = (walletId: string) =>
+  `/wallet/${walletId}/expense/bulk`;
 
 export const updateExpenseUrl = (walletId: string, expenseId: string) =>
   `/wallet/${walletId}/expense/${expenseId}`;

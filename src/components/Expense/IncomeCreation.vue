@@ -8,7 +8,7 @@ const emit = defineEmits(["update:expense"]);
 const walletStore = useWalletStore();
 
 async function createExpense(formPayload: SubmitExpenseEditFormPayload) {
-  const tags = await walletStore.createTags(formPayload.tags);
+  const tags = await walletStore.createTags(formPayload.tagNames);
 
   if (!tags) {
     return;

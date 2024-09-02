@@ -42,6 +42,8 @@ export default {
   },
   validation: {
     fieldIsRequired: "Обов'язкове поле",
+    minValue: "Мінімальне значення: {min}",
+    maxValue: "Максимальне значення: {max}",
   },
   notification: {
     walletAdded: "Гаманець додано",
@@ -60,6 +62,7 @@ export default {
     tagUpdated: "Тег {tagName} оновлено",
     tagDeleted: "Тег {tagName} видалено",
     expenseAdded: "Витрату додано",
+    expensesAdded: "Нові витрати додано",
     expenseUpdated: "Витрату оновлено",
     expenseDeleted: "Витрату видалено",
   },
@@ -79,6 +82,7 @@ export default {
     CategoryAlreadyExists: "Категорія з такою назвою вже існує",
     TagAlreadyExists: "Тег з такою назвою вже існує",
     ParentCategoryHasExpenses: "Батьківська категорія має витрати",
+    AccessDenied: "Недостатньо доступу",
   },
   home: {
     title: "Інформація про гаманці",
@@ -193,6 +197,13 @@ export default {
     seeAll: "Переглянути всі",
     noExpensesThisMonth: "У цьому місяці витрати відсутні",
     noExpensesThisYear: "У цьому році витрати відсутні",
+    splitExpense: "Розділити витрату",
+    addPart: "Додати частину",
+    minMaxAmountHint: "Мінімальна сума: {min}, максимальна сума: {max}",
+    minAmountHint: "Мінімальна сума: {min}",
+    remainder: "Залишок",
+    splitDisabledHint: "Виберіть категорію та введіть суму для розділення",
+    splitInto: "Поділено на такі категорії: {categories}",
   },
   income: {
     newIncome: "Нове надходження",

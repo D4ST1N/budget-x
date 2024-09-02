@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
   enrichExpenses,
-  formatDate,
   groupExpensesByDate,
+  monthRange,
 } from "@/helpers/utils";
 import { useWalletStore } from "@/store/wallet";
 import { ExpenseEnriched } from "@/types/Expense";
@@ -25,6 +25,7 @@ const selectedDate = ref(new Date());
 const expenses = ref<ExpenseEnriched[]>([]);
 const expanded = ref<boolean>(false);
 const isCalendarOpen = ref(false);
+const loading = ref<boolean>(false);
 const list = ref<InstanceType<typeof VList> | null>(null);
 
 const groupedExpenses = computed(() => {
@@ -33,22 +34,24 @@ const groupedExpenses = computed(() => {
 
 watch(currentWallet, fetchExpenses);
 watch(selectedDate, fetchExpenses);
+watch(expanded, (value) => {
+  if (value) {
+    fetchExpenses();
+  }
+});
 
-fetchExpenses();
+if (currentWallet.value) {
+  fetchExpenses();
+}
 
 async function fetchExpenses() {
   expenses.value = [];
 
-  const startDate = formatDate(
-    date.startOfMonth(selectedDate.value) as string,
-    "YYYY-MM-DD"
+  loading.value = true;
+  const expensesData = await walletStore.fetchExpenses(
+    expanded.value ? monthRange(selectedDate.value, date) : { limit: 10 }
   );
-  const endDate = formatDate(
-    date.endOfMonth(selectedDate.value) as string,
-    "YYYY-MM-DD"
-  );
-
-  const expensesData = await walletStore.fetchExpenses({ startDate, endDate });
+  loading.value = false;
 
   if (!expensesData) {
     return;
@@ -95,9 +98,17 @@ function showAllExpenses() {
         />
       </v-dialog>
 
-      <v-list-subheader v-if="expenses.length === 0">
+      <v-list-subheader v-if="expenses.length === 0 && !loading">
         {{ t("expense.noExpensesThisMonth") }}
       </v-list-subheader>
+
+      <template v-if="loading">
+        <v-skeleton-loader
+          v-for="key in 8"
+          :key="key"
+          type="list-item"
+        ></v-skeleton-loader>
+      </template>
 
       <template v-for="(dailyExpenses, date) in groupedExpenses" :key="date">
         <v-list-subheader sticky :class="$style.dateHeader">

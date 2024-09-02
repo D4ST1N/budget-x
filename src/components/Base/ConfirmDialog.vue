@@ -50,6 +50,11 @@ function onConfirmClick(isActive: Ref<boolean>) {
 <style lang="scss" module>
 .dialog {
   align-items: flex-start;
+
+  :global(.v-overlay__content) {
+    margin: 24px 12px;
+    max-width: calc(100% - 24px);
+  }
 }
 
 .actions {

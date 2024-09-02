@@ -153,3 +153,43 @@ export function groupExpensesByDate(
     {}
   );
 }
+
+export function monthRange(
+  dateValue: Date,
+  dateAdapter: DateInstance
+): { startDate: string; endDate: string } {
+  const startDate = dateAdapter.startOfDay(
+    dateAdapter.startOfMonth(dateValue)
+  ) as Date;
+  const endDate = dateAdapter.endOfDay(
+    dateAdapter.endOfMonth(dateValue)
+  ) as Date;
+
+  return {
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+  };
+}
+
+export function yearRange(
+  dateValue: Date,
+  dateAdapter: DateInstance
+): { startDate: string; endDate: string } {
+  const startDate = dateAdapter.startOfDay(
+    dateAdapter.startOfYear(dateValue)
+  ) as Date;
+  const endDate = dateAdapter.endOfDay(
+    dateAdapter.endOfYear(dateValue)
+  ) as Date;
+
+  return {
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+  };
+}
+
+export function limitDecimals(value: number, decimals: number): number {
+  const factor = Math.pow(10, decimals);
+
+  return Math.round(value * factor) / factor;
+}

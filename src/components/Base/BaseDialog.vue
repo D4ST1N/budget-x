@@ -45,6 +45,11 @@ const showDialog = computed({
   :global(.v-card-item) {
     padding: 16px !important;
   }
+
+  :global(.v-overlay__content) {
+    margin: 24px 12px;
+    max-width: calc(100% - 24px);
+  }
 }
 
 .multiLineTitle {

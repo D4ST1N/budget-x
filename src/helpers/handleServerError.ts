@@ -1,4 +1,5 @@
 import i18n from "@/plugins/i18n";
+import router from "@/router/router";
 import { useNotificationStore } from "@/store/notification";
 import { ErrorType } from "@/types/ErrorType";
 import { NotificationType } from "@/types/Notification";
@@ -21,6 +22,16 @@ export function handleServerError(
 ) {
   if (axios.isAxiosError(error)) {
     const notificationStore = useNotificationStore();
+
+    if (error.response?.status === 401) {
+      console.log(router, router.currentRoute.value.name);
+
+      if (router.currentRoute.value.name !== "Login") {
+        return router.push({ name: "Login" });
+      } else {
+        return;
+      }
+    }
 
     const serverError = error.response?.data as ServerResponseError;
 
