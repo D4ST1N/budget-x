@@ -26,6 +26,12 @@ const walletStore = useWalletStore();
 const { currentAccessLevel } = storeToRefs(walletStore);
 const isExpenseEditDialogOpen = ref<boolean>(false);
 
+const parentCategory = computed(() => {
+  if (!props.expense.category.parentCategory) return null;
+
+  return walletStore.categoryById(props.expense.category.parentCategory);
+});
+
 const editAllowed = computed(
   () =>
     hasAccess([AccessLevel.UpdateExpense], currentAccessLevel.value) &&
@@ -73,6 +79,7 @@ function onExpenseUpdate() {
   >
     <template #default>
       <v-list-item-subtitle>
+        <b v-if="parentCategory">{{ parentCategory.name }} /</b>
         {{ expense.category.name }}
       </v-list-item-subtitle>
       <div v-if="expense.tags.length" :class="$style.chips">

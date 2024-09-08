@@ -28,6 +28,7 @@ const { currentWallet } = storeToRefs(walletStore);
 const chartContainer = ref<InstanceType<typeof DashboardPanel> | null>(null);
 const containerWidth = ref<number>(360);
 const containerHeight = ref<number>(360);
+const containerSize = ref<number>(360);
 const selectedDate = ref(new Date());
 const chartType = ref<PieOrLine>(ChartType.Pie);
 const period = ref<MonthOrYear>(Period.Month);
@@ -130,8 +131,8 @@ const pieChartOptions = computed(() => {
     chart: {
       type: "pie",
       backgroundColor: "transparent",
-      width: containerWidth.value,
-      height: containerHeight.value,
+      width: containerSize.value,
+      height: containerSize.value,
       marginTop: -100,
     },
     title: {
@@ -169,8 +170,8 @@ const lineChartOptions = computed(() => {
     chart: {
       type: "line",
       backgroundColor: "transparent",
-      width: containerWidth.value,
-      height: containerHeight.value,
+      width: containerSize.value,
+      height: containerSize.value,
       marginTop: 30,
     },
     title: {
@@ -244,25 +245,40 @@ const noExpensesText = computed(() => {
     : t("expense.noExpensesThisYear");
 });
 
+const containerStyles = computed(() => {
+  if (containerSize.value === containerHeight.value) {
+    return {};
+  }
+
+  const diff = containerHeight.value - containerSize.value;
+
+  return {
+    marginTop: `${diff / 2}px`,
+  };
+});
+
 onMounted(() => {
   updateContainerSize();
 
   getData();
 });
 
-watch(chartOptions, () => {
-  chartKey.value += 1;
-  updateContainerSize();
-});
+watch(chartOptions, reRender);
 
 watch(period, getData);
 
 watch(currentWallet, getData);
 
+function reRender() {
+  chartKey.value += 1;
+  updateContainerSize();
+}
+
 function updateContainerSize() {
   if (chartContainer.value) {
     containerWidth.value = chartContainer.value.$el.clientWidth;
     containerHeight.value = chartContainer.value.$el.clientHeight - 190;
+    containerSize.value = Math.min(containerWidth.value, containerHeight.value);
   }
 }
 
@@ -315,6 +331,7 @@ async function getData() {
       :key="chartKey"
       :options="chartOptions"
       :class="$style.chart"
+      :style="containerStyles"
     ></highcharts>
     <div v-else :class="$style.noData">
       {{ noExpensesText }}

@@ -5,9 +5,12 @@ interface DialogProps {
   isOpen: boolean;
   title: string;
   titleIcon?: string;
+  maxWidth?: number;
 }
 
-const props = defineProps<DialogProps>();
+const props = withDefaults(defineProps<DialogProps>(), {
+  maxWidth: 400,
+});
 const emit = defineEmits(["update:isOpen"]);
 
 const showDialog = computed({
@@ -17,8 +20,8 @@ const showDialog = computed({
 </script>
 
 <template>
-  <v-dialog v-model="showDialog" width="400" :class="$style.dialog">
-    <v-card max-width="400" :prepend-icon="props.titleIcon">
+  <v-dialog width="auto" v-model="showDialog" :class="$style.dialog">
+    <v-card :max-width="props.maxWidth" :prepend-icon="props.titleIcon">
       <template #title>
         <v-card-title :class="$style.multiLineTitle">
           {{ props.title }}

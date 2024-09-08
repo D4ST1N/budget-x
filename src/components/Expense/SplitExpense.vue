@@ -62,6 +62,13 @@ watch(showDialog, (value) => {
   }
 });
 
+watch(
+  () => props.parts,
+  (value) => {
+    parts.value = value;
+  }
+);
+
 function addPart() {
   showAddPartDialog.value = true;
 }

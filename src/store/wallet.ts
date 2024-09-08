@@ -339,6 +339,7 @@ export const useWalletStore = defineStore(
 
       if (!createdTagsData) return null;
 
+      await fetchWalletTags();
       notificationStore.add({
         text: i18n.global.t("notification.tagsAdded"),
         type: NotificationType.Success,
